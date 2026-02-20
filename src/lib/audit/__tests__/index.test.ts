@@ -1,10 +1,10 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { runDesignAudit, generateAuditReport } from '../index';
 import type { DesignAudit } from '../types';
 
 // Mock all audit modules
 vi.mock('../accessibility', () => ({
-  auditAccessibility: vi.fn().mockReturnValue({
+  auditAccessibilitySync: vi.fn().mockReturnValue({
     score: 8.5,
     issues: ['LOW: Minor accessibility issue'],
     recommendations: ['Add ARIA labels']
