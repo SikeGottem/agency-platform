@@ -15,11 +15,12 @@ export interface DesignAudit {
 }
 
 export interface AccessibilityIssue {
-  type: 'contrast' | 'keyboard-nav' | 'aria' | 'focus-indicators' | 'alt-text';
+  type: 'contrast' | 'keyboard-navigation' | 'aria' | 'focus-indicators' | 'alt-text' | 'general';
   severity: 'low' | 'medium' | 'high' | 'critical';
   element?: string;
   description: string;
   recommendation: string;
+  page?: string; // Which page this issue was found on
 }
 
 export interface PerformanceIssue {
