@@ -145,7 +145,7 @@ const INITIAL_PAIRS: StylePair[] = [
 ];
 
 const ADAPTIVE_PAIRS: StylePair[] = [
-  // For users leaning minimal
+  // === Depth 2: Minimal variations ===
   {
     id: "minimal-depth-1",
     optionA: {
@@ -164,7 +164,44 @@ const ADAPTIVE_PAIRS: StylePair[] = [
     },
     weight: 1.0
   },
-  // For users leaning bold
+  {
+    id: "minimal-depth-2",
+    optionA: {
+      id: "japanese-minimal",
+      label: "Japanese Minimal",
+      image: "https://images.unsplash.com/photo-1545083036-b175dd155a1d?w=400&h=300&fit=crop&q=80",
+      description: "Wabi-sabi, intentional imperfection, zen calm",
+      scores: { minimal_ornate: 20, organic_geometric: -10, warm_cool: 5 }
+    },
+    optionB: {
+      id: "scandinavian-minimal",
+      label: "Scandinavian Minimal",
+      image: "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=400&h=300&fit=crop&q=80",
+      description: "Functional beauty, light wood, cozy simplicity",
+      scores: { minimal_ornate: 18, warm_cool: 12, organic_geometric: -5 }
+    },
+    weight: 1.0
+  },
+  {
+    id: "minimal-depth-3",
+    optionA: {
+      id: "brutalist-minimal",
+      label: "Brutalist",
+      image: "https://images.unsplash.com/photo-1520575733529-2b3b2f3fb4ff?w=400&h=300&fit=crop&q=80",
+      description: "Raw, honest, deliberately unpolished",
+      scores: { minimal_ornate: 10, bold_subtle: 15, modern_classic: 20, organic_geometric: 10 }
+    },
+    optionB: {
+      id: "swiss-minimal",
+      label: "Swiss Design",
+      image: "https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?w=400&h=300&fit=crop&q=80",
+      description: "Grid-based perfection, typographic hierarchy",
+      scores: { minimal_ornate: 18, organic_geometric: 22, modern_classic: 12 }
+    },
+    weight: 1.0
+  },
+
+  // === Depth 2: Bold variations ===
   {
     id: "bold-depth-1",
     optionA: {
@@ -182,7 +219,163 @@ const ADAPTIVE_PAIRS: StylePair[] = [
       scores: { bold_subtle: 20, playful_serious: -10, modern_classic: 10 }
     },
     weight: 1.0
-  }
+  },
+  {
+    id: "bold-depth-2",
+    optionA: {
+      id: "neon-bold",
+      label: "Neon & Electric",
+      image: "https://images.unsplash.com/photo-1550684376-efcbd6e3f031?w=400&h=300&fit=crop&q=80",
+      description: "Glowing accents, dark backgrounds, cyberpunk energy",
+      scores: { bold_subtle: 22, modern_classic: 18, warm_cool: -10 }
+    },
+    optionB: {
+      id: "editorial-bold",
+      label: "Editorial Bold",
+      image: "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=400&h=300&fit=crop&q=80",
+      description: "Magazine-style drama, oversized type, intentional contrast",
+      scores: { bold_subtle: 20, modern_classic: -5, light_heavy: -10 }
+    },
+    weight: 1.0
+  },
+
+  // === Depth 2: Warm variations ===
+  {
+    id: "warm-depth-1",
+    optionA: {
+      id: "cozy-warm",
+      label: "Cozy & Handcrafted",
+      image: "https://images.unsplash.com/photo-1556909114-44e3e70034e2?w=400&h=300&fit=crop&q=80",
+      description: "Hand-drawn elements, natural textures, artisanal",
+      scores: { warm_cool: 20, organic_geometric: -15, playful_serious: 10 }
+    },
+    optionB: {
+      id: "warm-luxury",
+      label: "Warm Luxury",
+      image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&h=300&fit=crop&q=80",
+      description: "Rich materials, amber tones, inviting opulence",
+      scores: { warm_cool: 18, light_heavy: -10, playful_serious: -12 }
+    },
+    weight: 1.0
+  },
+
+  // === Depth 2: Cool variations ===
+  {
+    id: "cool-depth-1",
+    optionA: {
+      id: "tech-cool",
+      label: "Tech Cool",
+      image: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=400&h=300&fit=crop&q=80",
+      description: "Blue-steel, data-driven, precise interfaces",
+      scores: { warm_cool: -18, modern_classic: 15, organic_geometric: 12 }
+    },
+    optionB: {
+      id: "icy-elegant",
+      label: "Icy Elegance",
+      image: "https://images.unsplash.com/photo-1551244072-5d12893278ab?w=400&h=300&fit=crop&q=80",
+      description: "Cool grays, silver accents, quiet sophistication",
+      scores: { warm_cool: -20, light_heavy: 10, playful_serious: -12 }
+    },
+    weight: 1.0
+  },
+
+  // === Depth 2: Typography focus ===
+  {
+    id: "type-depth-1",
+    optionA: {
+      id: "type-forward",
+      label: "Type-Forward",
+      image: "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=400&h=300&fit=crop&q=80",
+      description: "Typography IS the design, words are art",
+      scores: { bold_subtle: 15, modern_classic: 10, organic_geometric: 5 }
+    },
+    optionB: {
+      id: "image-forward",
+      label: "Image-Forward",
+      image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop&q=80",
+      description: "Photography-led, visuals tell the story",
+      scores: { bold_subtle: 10, warm_cool: 8, organic_geometric: -8 }
+    },
+    weight: 1.0
+  },
+
+  // === Depth 2: Playful variations ===
+  {
+    id: "playful-depth-1",
+    optionA: {
+      id: "quirky-illustration",
+      label: "Quirky & Illustrated",
+      image: "https://images.unsplash.com/photo-1618172193622-ae2d025f4032?w=400&h=300&fit=crop&q=80",
+      description: "Custom illustrations, character-driven, storybook feel",
+      scores: { playful_serious: 22, organic_geometric: -12, warm_cool: 10 }
+    },
+    optionB: {
+      id: "vibrant-modern",
+      label: "Vibrant Modern",
+      image: "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=400&h=300&fit=crop&q=80",
+      description: "Bright gradients, geometric play, tech-playful",
+      scores: { playful_serious: 18, modern_classic: 15, organic_geometric: 10 }
+    },
+    weight: 1.0
+  },
+
+  // === Depth 2: Luxury variations ===
+  {
+    id: "luxury-depth-1",
+    optionA: {
+      id: "old-money",
+      label: "Old Money",
+      image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400&h=300&fit=crop&q=80",
+      description: "Heritage, timelessness, understated wealth",
+      scores: { modern_classic: -15, light_heavy: -10, playful_serious: -18 }
+    },
+    optionB: {
+      id: "new-luxury",
+      label: "New Luxury",
+      image: "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=400&h=300&fit=crop&q=80",
+      description: "Contemporary premium, clean lines, refined innovation",
+      scores: { modern_classic: 18, light_heavy: 12, playful_serious: -8 }
+    },
+    weight: 1.0
+  },
+
+  // === Cross-cutting pairs ===
+  {
+    id: "texture-1",
+    optionA: {
+      id: "flat-digital",
+      label: "Flat & Digital",
+      image: "https://images.unsplash.com/photo-1618172193763-c511deb635ca?w=400&h=300&fit=crop&q=80",
+      description: "Crisp vectors, solid colors, screen-native",
+      scores: { modern_classic: 15, organic_geometric: 12, minimal_ornate: 8 }
+    },
+    optionB: {
+      id: "textured-tactile",
+      label: "Textured & Tactile",
+      image: "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=400&h=300&fit=crop&q=80",
+      description: "Paper grain, emboss effects, physical feel",
+      scores: { modern_classic: -12, organic_geometric: -10, warm_cool: 8 }
+    },
+    weight: 1.0
+  },
+  {
+    id: "density-1",
+    optionA: {
+      id: "breathing-room",
+      label: "Breathing Room",
+      image: "https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85?w=400&h=300&fit=crop&q=80",
+      description: "Generous margins, one idea per screen",
+      scores: { minimal_ornate: 18, light_heavy: 15, bold_subtle: -8 }
+    },
+    optionB: {
+      id: "content-rich",
+      label: "Content Rich",
+      image: "https://images.unsplash.com/photo-1504711434969-e33886168d5c?w=400&h=300&fit=crop&q=80",
+      description: "Dense information, dashboards, data-forward",
+      scores: { minimal_ornate: -15, modern_classic: 8, organic_geometric: 10 }
+    },
+    weight: 1.0
+  },
 ];
 
 // Style profiles based on scores
@@ -214,14 +407,49 @@ function calculateStyleProfile(scores: AdaptiveStyleData["scores"]) {
 }
 
 function getAdaptivePairs(scores: AdaptiveStyleData["scores"], choices: AdaptiveStyleData["choices"]): StylePair[] {
-  const pairs = [...ADAPTIVE_PAIRS];
+  const usedIds = new Set(choices.map(c => c.pairId));
   
-  // Filter pairs based on current direction
-  return pairs.filter(pair => {
-    if (scores.minimal_ornate > 10) return pair.id.includes("minimal");
-    if (scores.bold_subtle > 10) return pair.id.includes("bold");
-    return true; // Show all for balanced scores
-  });
+  // Score each pair by information gain — prioritize pairs that inform our LEAST confident axes
+  // and that match our current direction (depth pairs)
+  const scored = ADAPTIVE_PAIRS
+    .filter(pair => !usedIds.has(pair.id))
+    .map(pair => {
+      let relevanceScore = 0;
+      
+      // Check if this pair fits the client's emerging direction
+      const directions: Record<string, number> = {
+        'minimal': scores.minimal_ornate,
+        'bold': scores.bold_subtle,
+        'warm': scores.warm_cool,
+        'cool': -scores.warm_cool,
+        'playful': scores.playful_serious,
+        'luxury': -scores.light_heavy, // Approximation
+        'type': 0, // Always relevant
+        'texture': 0,
+        'density': 0,
+      };
+      
+      for (const [keyword, bias] of Object.entries(directions)) {
+        if (pair.id.includes(keyword) && bias > 5) {
+          relevanceScore += bias * 0.5; // Reward pairs that go deeper in client's direction
+        }
+      }
+      
+      // Bonus for cross-cutting pairs when we have many choices already
+      if (choices.length >= 4 && (pair.id.includes('texture') || pair.id.includes('density') || pair.id.includes('type'))) {
+        relevanceScore += 10;
+      }
+      
+      // Bonus for depth-2 pairs after initial broad questions
+      if (choices.length >= 3 && pair.id.includes('depth')) {
+        relevanceScore += 5;
+      }
+      
+      return { pair, score: relevanceScore };
+    })
+    .sort((a, b) => b.score - a.score);
+  
+  return scored.map(s => s.pair);
 }
 
 function generateTags(scores: AdaptiveStyleData["scores"]): string[] {
@@ -421,7 +649,7 @@ export function AdaptiveStyleSelector({
   }, [currentData.scores, currentData.choices]);
   
   const currentPair = availablePairs[currentPairIndex];
-  const isComplete = currentPairIndex >= Math.min(10, availablePairs.length); // Max 10 questions
+  const isComplete = currentPairIndex >= Math.min(12, availablePairs.length); // Max 12 questions
   
   // Auto-save function
   const autoSave = useCallback(() => {
@@ -729,11 +957,11 @@ export function AdaptiveStyleSelector({
           {/* Progress indicator */}
           <div className="space-y-2">
             <div className="flex justify-between text-sm text-muted-foreground">
-              <span>Question {currentPairIndex + 1} of {Math.min(10, availablePairs.length)}</span>
-              <span>~{Math.max(1, 10 - currentPairIndex)} min remaining</span>
+              <span>Question {currentPairIndex + 1} of {Math.min(12, availablePairs.length)}</span>
+              <span>~{Math.max(1, 12 - currentPairIndex)} min remaining</span>
             </div>
             <Progress 
-              value={((currentPairIndex + 1) / Math.min(10, availablePairs.length)) * 100} 
+              value={((currentPairIndex + 1) / Math.min(12, availablePairs.length)) * 100} 
               className="h-2"
             />
           </div>

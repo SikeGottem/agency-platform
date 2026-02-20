@@ -11,6 +11,8 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { StepProps } from "@/components/onboarding/questionnaire-wizard";
+import { computeStyleProfile, getSurpriseFont } from "@/lib/style-intelligence";
+import type { FontRecommendation } from "@/lib/style-intelligence";
 
 const FONT_STYLE_CARDS = [
   {
@@ -91,13 +93,38 @@ interface TypographyData {
   additionalNotes?: string;
 }
 
-export function TypographyFeelStep({ data, onSave, onNext, onPrev }: StepProps) {
+export function TypographyFeelStep({ data, onSave, onNext, onPrev, allResponses, styleProfile: passedProfile }: StepProps) {
   const existingData = data as TypographyData | undefined;
   const [fontStyles, setFontStyles] = useState<string[]>(existingData?.fontStyles ?? []);
   const [fontWeight, setFontWeight] = useState<string>(existingData?.fontWeight ?? "");
   const [comparisons, setComparisons] = useState<Record<string, string>>(existingData?.comparisons ?? {});
   const [additionalNotes, setAdditionalNotes] = useState(existingData?.additionalNotes ?? "");
   const [error, setError] = useState<string | null>(null);
+
+  // Style intelligence recommendations
+  const styleProfile = passedProfile ?? (allResponses ? computeStyleProfile(allResponses) : null);
+  const fontRecs: FontRecommendation[] = styleProfile?.recommendations?.fonts?.slice(0, 5) ?? [];
+  const topRecCategories = new Set(fontRecs.slice(0, 3).map(f => f.category.replace('-', '_').replace(' ', '_')));
+  
+  // Build a recommendation reason for each font style card
+  const getRecReason = (value: string): string | null => {
+    // Map card values to font database categories
+    const categoryMap: Record<string, string> = {
+      'serif': 'serif', 'sans-serif': 'sans-serif', 'display': 'display',
+      'script': 'script', 'monospace': 'monospace', 'handwritten': 'handwriting',
+    };
+    const cat = categoryMap[value];
+    if (!cat) return null;
+    const rec = fontRecs.find(f => f.category === cat || f.category === value);
+    return rec ? rec.reason : null;
+  };
+
+  // Sort font cards: recommended first
+  const sortedFontCards = [...FONT_STYLE_CARDS].sort((a, b) => {
+    const aRec = topRecCategories.has(a.value) ? 0 : 1;
+    const bRec = topRecCategories.has(b.value) ? 0 : 1;
+    return aRec - bRec;
+  });
 
   // Auto-save
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -202,12 +229,22 @@ export function TypographyFeelStep({ data, onSave, onNext, onPrev }: StepProps) 
         ))}
       </div>
 
+      {/* Smart recommendation hint */}
+      {fontRecs.length > 0 && fontRecs[0].reason && (
+        <div className="flex items-start gap-3 rounded-lg border border-primary/20 bg-primary/5 p-4 animate-in fade-in duration-500">
+          <Type className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+          <p className="text-sm text-primary">{fontRecs[0].reason} — we've highlighted our top picks below.</p>
+        </div>
+      )}
+
       {/* Font Style Cards */}
       <div>
         <h3 className="mb-3 text-sm font-medium">Font Style (select 1-2)</h3>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-          {FONT_STYLE_CARDS.map((style) => {
+          {sortedFontCards.map((style) => {
             const isSelected = fontStyles.includes(style.value);
+            const recReason = getRecReason(style.value);
+            const isRecommended = topRecCategories.has(style.value);
             return (
               <button
                 key={style.value}
@@ -234,6 +271,9 @@ export function TypographyFeelStep({ data, onSave, onNext, onPrev }: StepProps) 
                 )}>
                   <p className="text-sm font-semibold">{style.label}</p>
                   <p className="text-[10px] text-muted-foreground mt-0.5">{style.description}</p>
+                  {isRecommended && !isSelected && (
+                    <p className="text-[9px] text-primary font-medium mt-1">✨ Recommended for your style</p>
+                  )}
                 </div>
                 {/* Checkmark */}
                 <div

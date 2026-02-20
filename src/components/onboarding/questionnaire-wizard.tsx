@@ -20,6 +20,9 @@ import { InspirationUploadStep } from "@/components/onboarding/steps/inspiration
 import { TimelineBudgetStep } from "@/components/onboarding/steps/timeline-budget-step";
 import { FinalThoughtsStep } from "@/components/onboarding/steps/final-thoughts-step";
 import { ReviewStep } from "@/components/onboarding/steps/review-step";
+import { StyleProfileStep } from "@/components/onboarding/steps/style-profile-step";
+import { computeStyleProfile } from "@/lib/style-intelligence";
+import type { StyleProfile } from "@/lib/style-intelligence";
 import type { ProjectType } from "@/types";
 
 interface QuestionnaireWizardProps {
@@ -53,6 +56,7 @@ export interface StepProps {
   isFirst: boolean;
   isLast: boolean;
   allResponses?: Record<string, unknown>;
+  styleProfile?: StyleProfile;
   goToStep?: (stepKey: string) => void;
   magicToken?: string;
   /** Legacy token prop used by some step components */
@@ -94,6 +98,7 @@ function getStepsForProjectType(projectType: ProjectType): StepConfig[] {
   // Common design steps
   const designSteps: StepConfig[] = [
     { key: "style_direction", label: "Style Direction", component: StyleDirectionStep },
+    { key: "style_profile", label: "Your Style DNA", component: StyleProfileStep },
     { key: "color_preferences", label: "Colors", component: ColorPreferencesStep },
   ];
 
@@ -441,6 +446,9 @@ export function QuestionnaireWizard({
   const currentStepConfig = steps[currentStep];
   const StepComponent = currentStepConfig.component;
 
+  // Compute live style profile from all responses
+  const styleProfile = useMemo(() => computeStyleProfile(responses), [responses]);
+
   // Transition state
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [slideDirection, setSlideDirection] = useState<"left" | "right">("left");
@@ -538,6 +546,7 @@ export function QuestionnaireWizard({
           isFirst={currentStep === 0}
           isLast={currentStep === steps.length - 1}
           allResponses={responses}
+          styleProfile={styleProfile}
           goToStep={goToStepByKeyWithTransition}
           magicToken={magicToken}
           designerName={designerName}

@@ -15,6 +15,8 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { StepProps } from "@/components/onboarding/questionnaire-wizard";
+import { computeStyleProfile } from "@/lib/style-intelligence";
+import type { PaletteRecommendation } from "@/lib/style-intelligence";
 
 const PRESET_PALETTES = [
   {
@@ -120,7 +122,7 @@ interface ColorData {
   avoidColors: string[];
 }
 
-export function ColorPreferencesStep({ data, onSave, onNext, onPrev, allResponses }: StepProps) {
+export function ColorPreferencesStep({ data, onSave, onNext, onPrev, allResponses, styleProfile: passedProfile }: StepProps) {
   const existingData = data as ColorData | undefined;
   const [selectedPalettes, setSelectedPalettes] = useState<string[]>(
     existingData?.selectedPalettes ?? []
@@ -136,6 +138,18 @@ export function ColorPreferencesStep({ data, onSave, onNext, onPrev, allResponse
   // Get industry from business info for hints
   const businessInfo = allResponses?.business_info as { industry?: string } | undefined;
   const industryHint = businessInfo?.industry ? INDUSTRY_HINTS[businessInfo.industry] : null;
+
+  // Smart palette recommendations from style intelligence
+  const styleProfile = passedProfile ?? (allResponses ? computeStyleProfile(allResponses) : null);
+  const paletteRecs: PaletteRecommendation[] = styleProfile?.recommendations?.colorPalettes?.slice(0, 3) ?? [];
+  
+  // Sort presets: recommended ones first
+  const recNames = new Set(paletteRecs.map(r => r.name));
+  const sortedPalettes = [...PRESET_PALETTES].sort((a, b) => {
+    const aRec = recNames.has(a.name) ? 0 : 1;
+    const bRec = recNames.has(b.name) ? 0 : 1;
+    return aRec - bRec;
+  });
 
   // Auto-save
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -213,8 +227,9 @@ export function ColorPreferencesStep({ data, onSave, onNext, onPrev, allResponse
           Pick palettes you like (select any that appeal to you)
         </h3>
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-          {PRESET_PALETTES.map((palette) => {
+          {sortedPalettes.map((palette) => {
             const isSelected = selectedPalettes.includes(palette.name);
+            const rec = paletteRecs.find(r => r.name === palette.name);
             return (
               <button
                 key={palette.name}
@@ -224,7 +239,9 @@ export function ColorPreferencesStep({ data, onSave, onNext, onPrev, allResponse
                   "group relative rounded-xl border-2 p-3 transition-all duration-300 cursor-pointer btn-press",
                   isSelected
                     ? "border-primary ring-2 ring-primary/20 shadow-lg animate-selection-pop"
-                    : "border-border/30 opacity-60 hover:opacity-90 hover:shadow-md hover:border-muted-foreground/30 hover:-translate-y-0.5"
+                    : rec
+                      ? "border-primary/30 opacity-90 hover:opacity-100 hover:shadow-md hover:border-primary/50 hover:-translate-y-0.5"
+                      : "border-border/30 opacity-60 hover:opacity-90 hover:shadow-md hover:border-muted-foreground/30 hover:-translate-y-0.5"
                 )}
               >
                 {/* Checkmark */}
@@ -260,6 +277,12 @@ export function ColorPreferencesStep({ data, onSave, onNext, onPrev, allResponse
                 </div>
 
                 <p className="text-sm sm:text-xs font-semibold">{palette.name}</p>
+                {rec && !isSelected && (
+                  <div className="mt-1.5 flex items-center gap-1 text-[9px] text-primary font-medium">
+                    <Lightbulb className="h-2.5 w-2.5" />
+                    <span className="truncate">{rec.reason}</span>
+                  </div>
+                )}
               </button>
             );
           })}
