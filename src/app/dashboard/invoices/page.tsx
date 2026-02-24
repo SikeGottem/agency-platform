@@ -27,7 +27,7 @@ export default async function InvoicesPage() {
 
   const { data: projects } = await supabase
     .from("projects")
-    .select("id, name, client_email, client_name")
+    .select("id, project_type, client_email, client_name")
     .eq("designer_id", user.id)
     .order("created_at", { ascending: false });
 
