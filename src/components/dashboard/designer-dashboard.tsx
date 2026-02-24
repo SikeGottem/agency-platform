@@ -1,12 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, FileText, Clock, CheckCircle2, TrendingUp } from "lucide-react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { ProjectList } from "@/components/dashboard/project-list";
+import { DesignerOnboarding } from "@/components/onboarding/designer-onboarding";
+
+const ONBOARDING_KEY = "briefed_has_completed_onboarding";
 
 interface DesignerDashboardProps {
   userId: string;
@@ -28,6 +31,12 @@ interface Project {
 export function DesignerDashboard({ userId }: DesignerDashboardProps) {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+
+  const dismissOnboarding = useCallback(() => {
+    localStorage.setItem(ONBOARDING_KEY, "true");
+    setShowOnboarding(false);
+  }, []);
 
   useEffect(() => {
     async function fetchData() {
@@ -38,7 +47,15 @@ export function DesignerDashboard({ userId }: DesignerDashboardProps) {
         .eq("designer_id", userId)
         .order("created_at", { ascending: false });
 
-      setProjects(data || []);
+      const projectList = data || [];
+      setProjects(projectList);
+
+      // Show onboarding for first-run designers (0 projects, hasn't dismissed)
+      const completed = localStorage.getItem(ONBOARDING_KEY) === "true";
+      if (projectList.length === 0 && !completed) {
+        setShowOnboarding(true);
+      }
+
       setLoading(false);
     }
     fetchData();
@@ -80,6 +97,15 @@ export function DesignerDashboard({ userId }: DesignerDashboardProps) {
           ))}
         </div>
       </div>
+    );
+  }
+
+  if (showOnboarding) {
+    return (
+      <DesignerOnboarding
+        onComplete={dismissOnboarding}
+        onSkip={dismissOnboarding}
+      />
     );
   }
 
