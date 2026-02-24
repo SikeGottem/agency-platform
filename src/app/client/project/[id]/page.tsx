@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Download, FileIcon } from "lucide-react";
 import Link from "next/link";
+import { ClientFeedbackSection } from "@/components/portal/client-feedback-section";
 import {
   PROJECT_TYPE_LABELS,
   type ProjectType,
@@ -147,6 +148,14 @@ export default async function ClientProjectPage({ params }: PageProps) {
           token={project.magic_link_token ?? ""}
         />
       )}
+
+      {/* Feedback & Approval flows */}
+      <ClientFeedbackSection
+        projectId={projectId}
+        projectStatus={project.status}
+        userId={user.id}
+        hasPendingRevision={hasPendingRevision}
+      />
 
       {/* Brief viewer — read-only */}
       {(brief?.content || (responses && responses.length > 0)) && (
