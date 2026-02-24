@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { InvoiceDashboard } from "./invoice-dashboard";
-import type { UserRole } from "@/types";
+import type { UserRole, Invoice } from "@/types";
 
 export const metadata = {
   title: "Invoices — Briefed",
@@ -32,10 +32,18 @@ export default async function InvoicesPage() {
     .eq("designer_id", user.id)
     .order("created_at", { ascending: false });
 
+  // Map projects to expected shape
+  const mappedProjects = (projects ?? []).map((p) => ({
+    id: p.id,
+    name: `${p.project_type}${p.client_name ? ` — ${p.client_name}` : ""}`,
+    client_email: p.client_email,
+    client_name: p.client_name,
+  }));
+
   return (
     <InvoiceDashboard
-      invoices={invoices ?? []}
-      projects={projects ?? []}
+      invoices={(invoices as Invoice[]) ?? []}
+      projects={mappedProjects}
       designerId={user.id}
     />
   );

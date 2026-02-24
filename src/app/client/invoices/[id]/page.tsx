@@ -30,7 +30,8 @@ export default async function ClientInvoicePage({
   const { id } = await params;
   const supabase = await createClient();
 
-  const { data: invoice } = await supabase
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: invoice } = await (supabase as any)
     .from("invoices")
     .select("*")
     .eq("id", id)

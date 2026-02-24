@@ -268,7 +268,8 @@ function CreateInvoiceDialog({ projects, designerId, onClose, onCreated }: Creat
     }
     setSaving(true);
     try {
-      const supabase = createClient();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const supabase = createClient() as any;
       const { error } = await supabase.from("invoices").insert({
         project_id: projectId,
         designer_id: designerId,
@@ -468,7 +469,8 @@ function InvoicePreviewDialog({ invoice, onClose, onStatusChange }: PreviewDialo
   async function markAs(status: InvoiceStatus) {
     setUpdating(true);
     try {
-      const supabase = createClient();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const supabase = createClient() as any;
       const updates: Record<string, unknown> = { status };
       if (status === "paid") updates.paid_at = new Date().toISOString();
       const { error } = await supabase.from("invoices").update(updates).eq("id", invoice.id);
