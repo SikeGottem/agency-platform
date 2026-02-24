@@ -16,7 +16,7 @@ export async function GET(_req: NextRequest, ctx: RouteContext) {
     .from("deliverables")
     .select("*")
     .eq("project_id", projectId)
-    .order("round_number", { ascending: true })
+    .order("round", { ascending: true })
     .order("created_at", { ascending: true });
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
@@ -31,7 +31,7 @@ export async function POST(req: NextRequest, ctx: RouteContext) {
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await req.json();
-  const { title, description, file_url, file_type, version, round_number } = body;
+  const { title, description, file_url, file_type, version, round } = body;
 
   if (!title) return NextResponse.json({ error: "Title is required" }, { status: 400 });
 
@@ -43,9 +43,9 @@ export async function POST(req: NextRequest, ctx: RouteContext) {
       title,
       description: description || null,
       file_url: file_url || null,
-      file_type: file_type || null,
+      file_type: file_type || "other",
       version: version || 1,
-      round_number: round_number || 1,
+      round: round || 1,
       status: "draft",
     })
     .select()

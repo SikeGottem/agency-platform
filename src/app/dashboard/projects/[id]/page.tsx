@@ -80,7 +80,7 @@ export default async function DesignerProjectPage({ params }: PageProps) {
     .from("deliverables")
     .select("*")
     .eq("project_id", projectId)
-    .order("round_number", { ascending: true })
+    .order("round", { ascending: true })
     .order("created_at", { ascending: true });
 
   // Fetch or init lifecycle
@@ -100,7 +100,7 @@ export default async function DesignerProjectPage({ params }: PageProps) {
   const deliverableStats = {
     total: allDeliverables.length,
     draft: allDeliverables.filter((d: { status: string }) => d.status === "draft").length,
-    shared: allDeliverables.filter((d: { status: string }) => d.status === "shared").length,
+    shared: allDeliverables.filter((d: { status: string }) => ["shared", "awaiting_feedback", "feedback_given", "changes_addressed"].includes(d.status)).length,
     approved: allDeliverables.filter((d: { status: string }) => d.status === "approved").length,
   };
 
@@ -240,7 +240,7 @@ export default async function DesignerProjectPage({ params }: PageProps) {
               created_at: project.created_at,
               magic_link_token: (project as Record<string, unknown>).magic_link_token as string | null,
             }}
-            lifecycle={lifecycle as ProjectSidebarProps_Lifecycle}
+            lifecycle={lifecycle as { current_phase: string; client_health_score: number; blockers: { id: string; description: string; severity: string }[] } | null}
             deliverableStats={deliverableStats}
           />
         </div>
@@ -248,10 +248,3 @@ export default async function DesignerProjectPage({ params }: PageProps) {
     </div>
   );
 }
-
-// Helper type for the sidebar lifecycle prop
-type ProjectSidebarProps_Lifecycle = {
-  current_phase: string;
-  client_health_score: number;
-  blockers: { id: string; description: string; severity: string }[];
-} | null;

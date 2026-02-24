@@ -27,8 +27,8 @@ export interface Deliverable {
   file_url: string | null;
   file_type: string | null;
   version: number;
-  round_number: number;
-  status: "draft" | "shared" | "feedback" | "approved";
+  round: number;
+  status: "draft" | "shared" | "awaiting_feedback" | "feedback_given" | "changes_addressed" | "approved";
   shared_at: string | null;
   created_at: string;
   updated_at: string;
@@ -39,10 +39,12 @@ interface WorkTabProps {
   initialDeliverables: Deliverable[];
 }
 
-const STATUS_CONFIG = {
+const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
   draft: { label: "Draft", color: "bg-stone-100 text-stone-600" },
   shared: { label: "Shared", color: "bg-blue-50 text-blue-700" },
-  feedback: { label: "Feedback", color: "bg-amber-50 text-amber-700" },
+  awaiting_feedback: { label: "Awaiting Feedback", color: "bg-purple-50 text-purple-700" },
+  feedback_given: { label: "Feedback", color: "bg-amber-50 text-amber-700" },
+  changes_addressed: { label: "Changes Done", color: "bg-blue-50 text-blue-700" },
   approved: { label: "Approved", color: "bg-emerald-50 text-emerald-700" },
 };
 
@@ -71,9 +73,9 @@ export function WorkTab({ projectId, initialDeliverables }: WorkTabProps) {
   // Group by round
   const rounds = new Map<number, Deliverable[]>();
   deliverables.forEach((d) => {
-    const list = rounds.get(d.round_number) || [];
+    const list = rounds.get(d.round) || [];
     list.push(d);
-    rounds.set(d.round_number, list);
+    rounds.set(d.round, list);
   });
   const sortedRounds = Array.from(rounds.keys()).sort((a, b) => a - b);
   const maxRound = sortedRounds.length > 0 ? Math.max(...sortedRounds) : 0;
@@ -115,7 +117,7 @@ export function WorkTab({ projectId, initialDeliverables }: WorkTabProps) {
       }
 
       // Calculate next version for this round
-      const roundItems = deliverables.filter((d) => d.round_number === addRound);
+      const roundItems = deliverables.filter((d) => d.round === addRound);
       const nextVersion = roundItems.length > 0 ? Math.max(...roundItems.map((d) => d.version)) + 1 : 1;
 
       const res = await fetch(`/api/projects/${projectId}/deliverables`, {
@@ -127,7 +129,7 @@ export function WorkTab({ projectId, initialDeliverables }: WorkTabProps) {
           file_url,
           file_type,
           version: nextVersion,
-          round_number: addRound,
+          round: addRound,
         }),
       });
 
@@ -158,7 +160,7 @@ export function WorkTab({ projectId, initialDeliverables }: WorkTabProps) {
 
   const shareRound = async (roundNumber: number) => {
     const roundItems = deliverables.filter(
-      (d) => d.round_number === roundNumber && d.status === "draft"
+      (d) => d.round === roundNumber && d.status === "draft"
     );
     for (const item of roundItems) {
       await updateStatus(item.id, "shared");
