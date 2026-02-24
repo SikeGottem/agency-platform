@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { NextResponse } from "next/server";
 import { timingSafeTokenCompare } from "@/lib/utils";
+import { sendNotification } from "@/lib/email-notifications";
 
 // GET: Fetch revision requests for a project
 // Designers: authenticated via session
@@ -93,6 +94,38 @@ export async function POST(
       { error: "Failed to create revision request" },
       { status: 500 }
     );
+  }
+
+  // Send email to client about revision request
+  try {
+    const admin = createAdminClient();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: project } = await (admin as any)
+      .from("projects")
+      .select("*, profiles:designer_id(email, full_name)")
+      .eq("id", projectId)
+      .single();
+
+    if (project?.client_email) {
+      const designerProfile = project.profiles as {
+        email: string;
+        full_name: string | null;
+      } | null;
+
+      sendNotification({
+        type: "revision_request",
+        projectId,
+        projectType: project.project_type,
+        clientName: project.client_name ?? project.client_email,
+        clientEmail: project.client_email,
+        designerName: designerProfile?.full_name ?? "Your Designer",
+        designerEmail: designerProfile?.email ?? "",
+        magicLinkToken: project.magic_link_token ?? undefined,
+        message,
+      }).catch(() => {});
+    }
+  } catch (notifError) {
+    console.error("[revisions] Email notification failed:", notifError);
   }
 
   return NextResponse.json({ revision });
