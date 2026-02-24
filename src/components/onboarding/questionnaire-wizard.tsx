@@ -299,6 +299,50 @@ export function QuestionnaireWizard({
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
   const [celebrationStep, setCelebrationStep] = useState<number | null>(null);
 
+  // Analytics: track step timing
+  const stepStartTimeRef = useRef(Date.now());
+  const prevStepRef = useRef(0);
+
+  const recordStepAnalytics = useCallback(
+    (stepIndex: number, skipped: boolean) => {
+      const stepConfig = steps[stepIndex];
+      if (!stepConfig) return;
+      const now = Date.now();
+      const durationMs = now - stepStartTimeRef.current;
+      const durationSeconds = Math.round(durationMs / 1000);
+      const startedAt = new Date(stepStartTimeRef.current).toISOString();
+      const completedAt = new Date(now).toISOString();
+
+      // Fire and forget — don't block navigation
+      fetch("/api/analytics/questionnaire", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          project_id: projectId,
+          step_key: stepConfig.key,
+          started_at: startedAt,
+          completed_at: completedAt,
+          duration_seconds: durationSeconds,
+          skipped,
+        }),
+      }).catch(() => {}); // silently ignore analytics failures
+    },
+    [steps, projectId]
+  );
+
+  // When step changes, record analytics for the previous step
+  useEffect(() => {
+    if (currentStep !== prevStepRef.current) {
+      const wasSkipped =
+        currentStep > prevStepRef.current + 1 || // jumped forward
+        (steps[prevStepRef.current]?.optional === true &&
+          !responses[steps[prevStepRef.current]?.key]);
+      recordStepAnalytics(prevStepRef.current, wasSkipped);
+      prevStepRef.current = currentStep;
+      stepStartTimeRef.current = Date.now();
+    }
+  }, [currentStep, recordStepAnalytics, steps, responses]);
+
   const progress = ((currentStep + 1) / steps.length) * 100;
   
   // Time estimation
@@ -380,6 +424,8 @@ export function QuestionnaireWizard({
   );
 
   const handleSubmit = async () => {
+    // Record analytics for the final step before submitting
+    recordStepAnalytics(currentStep, false);
     setIsSaving(true);
     try {
       const headers: Record<string, string> = {};

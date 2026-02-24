@@ -13,6 +13,7 @@ import { OverviewStats } from "@/components/dashboard/analytics/overview-stats";
 import { ProjectFunnel } from "@/components/dashboard/analytics/project-funnel";
 import { ResponseTimeChart } from "@/components/dashboard/analytics/response-time-chart";
 import { StyleInsights } from "@/components/dashboard/analytics/style-insights";
+import { QuestionnaireStepAnalytics } from "@/components/dashboard/analytics/questionnaire-step-analytics";
 
 export const metadata = {
   title: "Analytics — Briefed",
@@ -34,11 +35,13 @@ export default async function AnalyticsPage() {
   }
 
   // Fetch all analytics data in parallel
-  const [overviewStats, funnelData, responseTimeData, styleInsights] = await Promise.all([
+  const [overviewStats, funnelData, responseTimeData, styleInsights, questionnaireAnalytics] = await Promise.all([
     getOverviewStats(supabase, user.id),
     getFunnelData(supabase, user.id),
     getResponseTimeData(supabase, user.id),
     getStyleInsights(supabase, user.id),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (supabase as any).from("questionnaire_analytics").select("*").then((r: any) => r.data || []),
   ]);
 
   return (
@@ -111,6 +114,17 @@ export default async function AnalyticsPage() {
               </p>
             </div>
             <StyleInsights data={styleInsights} />
+          </section>
+
+          {/* Questionnaire Step Analytics */}
+          <section>
+            <div className="mb-6">
+              <h2 className="text-lg font-semibold mb-1">Questionnaire Step Analytics</h2>
+              <p className="text-sm text-muted-foreground">
+                How long clients spend on each step, where they drop off, and completion rates
+              </p>
+            </div>
+            <QuestionnaireStepAnalytics data={questionnaireAnalytics} />
           </section>
 
           {/* Upgrade prompt for free users */}

@@ -14,6 +14,9 @@ import {
   Menu,
   X,
   Briefcase,
+  BarChart3,
+  Users,
+  Receipt,
 } from "lucide-react";
 import { NotificationBell } from "@/components/dashboard/notification-bell";
 import { cn } from "@/lib/utils";
@@ -31,7 +34,10 @@ interface SidebarNavProps {
 
 const designerNavItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/dashboard/clients", label: "Clients", icon: Users },
   { href: "/dashboard/templates", label: "Templates", icon: FileText },
+  { href: "/dashboard/analytics", label: "Analytics", icon: BarChart3 },
+  { href: "/dashboard/invoices", label: "Invoices", icon: Receipt },
   { href: "/dashboard/settings", label: "Settings", icon: Settings },
 ];
 
