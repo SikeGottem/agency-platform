@@ -23,7 +23,7 @@ export interface TemplateStep {
 
 export interface TemplateData {
   name: string;
-  projectType: "branding" | "web_design" | "social_media";
+  projectType: string;
   steps: TemplateStep[];
 }
 
@@ -229,6 +229,115 @@ export const DEFAULT_TEMPLATES: TemplateData[] = [
       businessInfoStep,
       projectScopeSocialStep,
       platformsContentStep,
+      styleDirectionStep,
+      colorPreferencesStep,
+      inspirationUploadStep,
+      timelineBudgetStep,
+      finalThoughtsStep,
+    ],
+  },
+  {
+    name: "Packaging",
+    projectType: "packaging",
+    steps: [
+      welcomeStep,
+      businessInfoStep,
+      { ...projectScopeBrandingStep, key: "project_scope", title: "Project Scope", description: "What packaging deliverables do you need?", questions: [
+        { id: "deliverables", label: "What do you need?", type: "checkbox", options: ["Product Box", "Label Design", "Bag / Pouch", "Bottle / Can Wrap", "Shipping Box", "Insert / Tissue Paper", "Unboxing Experience"], required: true },
+        { id: "usageContexts", label: "Where will this be sold?", type: "checkbox", options: ["Retail Shelf", "E-commerce", "Subscription Box", "Wholesale", "Direct to Consumer"], required: true },
+        { id: "productDetails", label: "Describe your product and its dimensions", type: "textarea", required: true },
+      ]},
+      styleDirectionStep,
+      colorPreferencesStep,
+      inspirationUploadStep,
+      timelineBudgetStep,
+      finalThoughtsStep,
+    ],
+  },
+  {
+    name: "Illustration",
+    projectType: "illustration",
+    steps: [
+      welcomeStep,
+      businessInfoStep,
+      { key: "project_scope", title: "Project Scope", description: "What illustration work do you need?", enabled: true, builtIn: true, questions: [
+        { id: "deliverables", label: "What do you need?", type: "checkbox", options: ["Custom Illustrations", "Icon Set", "Character Design", "Infographics", "Editorial Illustration", "Pattern Design", "Spot Illustrations"], required: true },
+        { id: "usageContexts", label: "Where will these be used?", type: "checkbox", options: ["Website", "Print", "Social Media", "Merchandise", "Editorial", "Packaging", "App / UI"], required: true },
+        { id: "illustrationStyle", label: "Describe the illustration style you're looking for", type: "textarea" },
+      ]},
+      styleDirectionStep,
+      colorPreferencesStep,
+      inspirationUploadStep,
+      timelineBudgetStep,
+      finalThoughtsStep,
+    ],
+  },
+  {
+    name: "UI/UX Design",
+    projectType: "ui_ux",
+    steps: [
+      welcomeStep,
+      businessInfoStep,
+      { key: "project_scope", title: "Project Scope", description: "What UI/UX deliverables do you need?", enabled: true, builtIn: true, questions: [
+        { id: "deliverables", label: "What do you need?", type: "checkbox", options: ["Wireframes", "High-fidelity Mockups", "Interactive Prototype", "Design System", "User Research", "Usability Testing", "Information Architecture"], required: true },
+        { id: "usageContexts", label: "Target platforms", type: "checkbox", options: ["Web App", "iOS App", "Android App", "Desktop App", "Responsive Web"], required: true },
+      ]},
+      pagesFunctionalityStep,
+      styleDirectionStep,
+      colorPreferencesStep,
+      inspirationUploadStep,
+      timelineBudgetStep,
+      finalThoughtsStep,
+    ],
+  },
+  {
+    name: "Print Design",
+    projectType: "print",
+    steps: [
+      welcomeStep,
+      businessInfoStep,
+      { key: "project_scope", title: "Project Scope", description: "What print deliverables do you need?", enabled: true, builtIn: true, questions: [
+        { id: "deliverables", label: "What do you need?", type: "checkbox", options: ["Business Cards", "Brochure", "Flyer / Poster", "Booklet / Catalog", "Letterhead & Stationery", "Banner / Signage", "Menu", "Invitation"], required: true },
+        { id: "usageContexts", label: "Print specifications", type: "checkbox", options: ["Standard Paper", "Premium Paper", "Large Format", "Die-cut", "Foil / Emboss", "Digital Print", "Offset Print"], required: true },
+        { id: "dimensions", label: "Required sizes / dimensions", type: "textarea" },
+      ]},
+      styleDirectionStep,
+      colorPreferencesStep,
+      typographyFeelStep,
+      inspirationUploadStep,
+      timelineBudgetStep,
+      finalThoughtsStep,
+    ],
+  },
+  {
+    name: "Motion Design",
+    projectType: "motion",
+    steps: [
+      welcomeStep,
+      businessInfoStep,
+      { key: "project_scope", title: "Project Scope", description: "What motion design deliverables do you need?", enabled: true, builtIn: true, questions: [
+        { id: "deliverables", label: "What do you need?", type: "checkbox", options: ["Logo Animation", "Explainer Video", "Social Media Animations", "UI Animations / Micro-interactions", "Title Sequence", "Motion Graphics Package", "GIF / Stickers"], required: true },
+        { id: "usageContexts", label: "Where will this be used?", type: "checkbox", options: ["Website", "Social Media", "Presentation", "Broadcast / TV", "App / Product", "Trade Show / Event"], required: true },
+        { id: "duration", label: "Estimated duration", type: "select", options: ["Under 15 seconds", "15-30 seconds", "30-60 seconds", "1-2 minutes", "2+ minutes", "Not sure"] },
+      ]},
+      styleDirectionStep,
+      colorPreferencesStep,
+      inspirationUploadStep,
+      timelineBudgetStep,
+      finalThoughtsStep,
+    ],
+  },
+  {
+    name: "App Design",
+    projectType: "app_design",
+    steps: [
+      welcomeStep,
+      businessInfoStep,
+      { key: "project_scope", title: "Project Scope", description: "What app design deliverables do you need?", enabled: true, builtIn: true, questions: [
+        { id: "deliverables", label: "What do you need?", type: "checkbox", options: ["Full App Design", "App Redesign", "App Icon & Store Assets", "Onboarding Flow", "Design System", "Prototype"], required: true },
+        { id: "usageContexts", label: "Target platforms", type: "checkbox", options: ["iOS", "Android", "Cross-platform", "Tablet", "Wearable"], required: true },
+      ]},
+      pagesFunctionalityStep,
       styleDirectionStep,
       colorPreferencesStep,
       inspirationUploadStep,

@@ -92,7 +92,7 @@ export interface Database {
           id: string;
           designer_id: string;
           name: string;
-          project_type: "branding" | "web_design" | "social_media";
+          project_type: string;
           questions: Json;
           is_default: boolean;
           created_at: string;
@@ -102,7 +102,7 @@ export interface Database {
           id?: string;
           designer_id: string;
           name: string;
-          project_type: "branding" | "web_design" | "social_media";
+          project_type: string;
           questions?: Json;
           is_default?: boolean;
           created_at?: string;
@@ -112,7 +112,7 @@ export interface Database {
           id?: string;
           designer_id?: string;
           name?: string;
-          project_type?: "branding" | "web_design" | "social_media";
+          project_type?: string;
           questions?: Json;
           is_default?: boolean;
           created_at?: string;
@@ -135,7 +135,7 @@ export interface Database {
           client_id: string | null;
           client_email: string;
           client_name: string | null;
-          project_type: "branding" | "web_design" | "social_media";
+          project_type: string;
           template_id: string | null;
           status: "draft" | "sent" | "in_progress" | "completed" | "reviewed";
           magic_link_token: string | null;
@@ -150,7 +150,7 @@ export interface Database {
           client_id?: string | null;
           client_email: string;
           client_name?: string | null;
-          project_type: "branding" | "web_design" | "social_media";
+          project_type: string;
           template_id?: string | null;
           status?: "draft" | "sent" | "in_progress" | "completed" | "reviewed";
           magic_link_token?: string | null;
@@ -165,7 +165,7 @@ export interface Database {
           client_id?: string | null;
           client_email?: string;
           client_name?: string | null;
-          project_type?: "branding" | "web_design" | "social_media";
+          project_type?: string;
           template_id?: string | null;
           status?: "draft" | "sent" | "in_progress" | "completed" | "reviewed";
           magic_link_token?: string | null;

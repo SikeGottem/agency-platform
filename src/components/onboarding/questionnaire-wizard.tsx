@@ -21,6 +21,9 @@ import { TimelineBudgetStep } from "@/components/onboarding/steps/timeline-budge
 import { FinalThoughtsStep } from "@/components/onboarding/steps/final-thoughts-step";
 import { ReviewStep } from "@/components/onboarding/steps/review-step";
 import { StyleProfileStep } from "@/components/onboarding/steps/style-profile-step";
+import { QuickWhatStep } from "@/components/onboarding/steps/quick/quick-what-step";
+import { QuickStyleStep } from "@/components/onboarding/steps/quick/quick-style-step";
+import { QuickTimelineStep } from "@/components/onboarding/steps/quick/quick-timeline-step";
 import { computeStyleProfile } from "@/lib/style-intelligence";
 import type { StyleProfile } from "@/lib/style-intelligence";
 import type { ProjectType } from "@/types";
@@ -38,6 +41,8 @@ interface QuestionnaireWizardProps {
   token?: string;
   templateQuestions?: unknown[];
   brandColor?: string;
+  /** Brief mode — 'quick' shows a condensed 3-step questionnaire */
+  briefMode?: "full" | "quick";
 }
 
 interface StepConfig {
@@ -78,6 +83,14 @@ export interface StepProps {
   onSkip?: () => void;
 }
 
+function getQuickSteps(): StepConfig[] {
+  return [
+    { key: "quick_what", label: "What Are We Building?", component: QuickWhatStep, section: "basics" },
+    { key: "quick_style", label: "Style Direction", component: QuickStyleStep, section: "design" },
+    { key: "quick_timeline", label: "Timeline & Budget", component: QuickTimelineStep, section: "closing" },
+  ];
+}
+
 function getStepsForProjectType(projectType: ProjectType): StepConfig[] {
   const baseSteps: StepConfig[] = [
     { key: "welcome", label: "Welcome", component: WelcomeStep, section: "basics" },
@@ -88,20 +101,26 @@ function getStepsForProjectType(projectType: ProjectType): StepConfig[] {
   // Project-type specific steps inserted after project_scope
   const projectSpecificSteps: StepConfig[] = [];
 
-  if (projectType === "web_design") {
-    projectSpecificSteps.push({
-      key: "pages_functionality",
-      label: "Pages & Features",
-      component: PagesFunctionalityStep,
-      section: "basics",
-    });
-  } else if (projectType === "social_media") {
-    projectSpecificSteps.push({
-      key: "platforms_content",
-      label: "Platforms & Content",
-      component: PlatformsContentStep,
-      section: "basics",
-    });
+  switch (projectType) {
+    case "web_design":
+    case "ui_ux":
+    case "app_design":
+      projectSpecificSteps.push({
+        key: "pages_functionality",
+        label: "Pages & Features",
+        component: PagesFunctionalityStep,
+        section: "basics",
+      });
+      break;
+    case "social_media":
+      projectSpecificSteps.push({
+        key: "platforms_content",
+        label: "Platforms & Content",
+        component: PlatformsContentStep,
+        section: "basics",
+      });
+      break;
+    // branding, packaging, illustration, print, motion — use base steps only
   }
 
   // Common design steps
@@ -111,8 +130,8 @@ function getStepsForProjectType(projectType: ProjectType): StepConfig[] {
     { key: "color_preferences", label: "Colors", component: ColorPreferencesStep, section: "design" },
   ];
 
-  // Typography step only for branding projects
-  if (projectType === "branding") {
+  // Typography step for branding and print projects
+  if (projectType === "branding" || projectType === "print") {
     designSteps.push({
       key: "typography_feel",
       label: "Typography",
@@ -265,8 +284,10 @@ export function QuestionnaireWizard({
   existingResponses,
   isCompleted,
   magicToken,
+  briefMode = "full",
 }: QuestionnaireWizardProps) {
-  const steps = getStepsForProjectType(projectType);
+  const steps = briefMode === "quick" ? getQuickSteps() : getStepsForProjectType(projectType);
+  const isQuickMode = briefMode === "quick";
   const [currentStep, setCurrentStep] = useState(0);
   const [responses, setResponses] = useState<Record<string, unknown>>(existingResponses);
   const [isSaving, setIsSaving] = useState(false);
@@ -599,6 +620,8 @@ export function QuestionnaireWizard({
           clientName={clientName}
           isOptional={currentStepConfig.optional}
           onSkip={currentStepConfig.optional ? handleNextWithTransition : undefined}
+          onSubmit={isQuickMode && currentStep === steps.length - 1 ? handleSubmit : undefined}
+          isSaving={isSaving}
         />
       </div>
 

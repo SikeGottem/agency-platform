@@ -27,16 +27,25 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, ArrowLeft, Send, User, Mail, Briefcase, FileText, Wand2 } from "lucide-react";
+import {
+  Loader2, ArrowLeft, Send, User, Mail, Briefcase, FileText, Wand2,
+  Palette, Globe, Share2, Package, PenTool, Layout, Printer, Play, Smartphone,
+  Zap, ClipboardList,
+} from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
-import { PROJECT_TYPES, PROJECT_TYPE_LABELS, type ProjectType } from "@/types";
+import { PROJECT_TYPES, PROJECT_TYPE_LABELS, PROJECT_TYPE_ICONS, type ProjectType } from "@/types";
+
+const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
+  Palette, Globe, Share2, Package, PenTool, Layout, Printer, Play, Smartphone,
+};
 
 const newProjectSchema = z.object({
   clientName: z.string().min(1, "Client name is required").max(100),
   clientEmail: z.string().email("Please enter a valid email address"),
   projectType: z.enum(PROJECT_TYPES),
+  briefMode: z.enum(["full", "quick"]).default("full"),
   templateId: z.string().optional(),
   customMessage: z.string().max(500).optional(),
 });
@@ -204,20 +213,27 @@ export function NewProjectForm({ templates }: NewProjectFormProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Project Type</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select project type" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {PROJECT_TYPES.map((type) => (
-                        <SelectItem key={type} value={type}>
-                          {PROJECT_TYPE_LABELS[type]}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <div className="grid grid-cols-3 gap-2">
+                    {PROJECT_TYPES.map((type) => {
+                      const IconComp = ICON_MAP[PROJECT_TYPE_ICONS[type]];
+                      const isSelected = field.value === type;
+                      return (
+                        <button
+                          key={type}
+                          type="button"
+                          onClick={() => field.onChange(type)}
+                          className={`flex flex-col items-center gap-1.5 rounded-lg border-2 p-3 text-sm transition-colors hover:bg-accent ${
+                            isSelected
+                              ? "border-primary bg-primary/5 text-primary"
+                              : "border-muted text-muted-foreground"
+                          }`}
+                        >
+                          {IconComp && <IconComp className="h-5 w-5" />}
+                          <span className="font-medium text-xs">{PROJECT_TYPE_LABELS[type]}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}
