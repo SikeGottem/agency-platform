@@ -5,7 +5,7 @@ import { ClientRevisionBanner } from "@/components/brief/client-revision-banner"
 import { ProjectTimeline } from "@/components/client/project-timeline";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Download, FileIcon } from "lucide-react";
 import Link from "next/link";
 import {
   PROJECT_TYPE_LABELS,
@@ -117,18 +117,22 @@ export default async function ClientProjectPage({ params }: PageProps) {
           className={
             hasPendingRevision
               ? "bg-red-50 text-red-700"
-              : project.status === "completed" || project.status === "reviewed"
-                ? "bg-emerald-50 text-emerald-700"
-                : "bg-amber-50 text-amber-700"
+              : project.status === "reviewed"
+                ? "bg-purple-50 text-purple-700"
+                : project.status === "completed"
+                  ? "bg-emerald-50 text-emerald-700"
+                  : "bg-amber-50 text-amber-700"
           }
         >
           {hasPendingRevision
             ? "Needs Revision"
             : project.status === "reviewed"
-              ? "Approved"
+              ? "Done"
               : project.status === "completed"
-                ? "Submitted"
-                : "In Progress"}
+                ? "Ready for Review"
+                : project.status === "in_progress"
+                  ? "In Design"
+                  : "Brief Submitted"}
         </Badge>
       </div>
 
@@ -154,6 +158,23 @@ export default async function ClientProjectPage({ params }: PageProps) {
             projectId={projectId}
             responses={responses ?? []}
           />
+        </div>
+      )}
+
+      {/* Deliverables section — shown when project is reviewed/done */}
+      {project.status === "reviewed" && (
+        <div className="rounded-2xl border border-stone-200/60 bg-white p-6">
+          <h2 className="font-[family-name:var(--font-display)] text-xl font-semibold text-stone-900 mb-4">
+            Deliverables
+          </h2>
+          <div className="rounded-xl border border-dashed border-stone-200 bg-stone-50/50 p-8 text-center">
+            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-stone-100">
+              <FileIcon className="h-5 w-5 text-stone-400" />
+            </div>
+            <p className="text-sm text-stone-500">
+              Your designer will upload deliverables here when they&apos;re ready.
+            </p>
+          </div>
         </div>
       )}
 

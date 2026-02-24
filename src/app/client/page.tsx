@@ -12,32 +12,33 @@ export const metadata = {
   title: "My Projects — Briefed",
 };
 
+// Client-friendly status labels (not internal designer statuses)
 const STATUS_CONFIG: Record<
   string,
   { label: string; color: string; dot: string }
 > = {
   draft: {
-    label: "Draft",
+    label: "Brief Submitted",
     color: "bg-stone-100 text-stone-600",
     dot: "bg-stone-400",
   },
   sent: {
-    label: "Awaiting you",
+    label: "Brief Submitted",
     color: "bg-blue-50 text-blue-700",
     dot: "bg-blue-500",
   },
   in_progress: {
-    label: "In Progress",
+    label: "In Design",
     color: "bg-amber-50 text-amber-700",
     dot: "bg-amber-500",
   },
   completed: {
-    label: "Completed",
+    label: "Ready for Review",
     color: "bg-emerald-50 text-emerald-700",
     dot: "bg-emerald-500",
   },
   reviewed: {
-    label: "Approved",
+    label: "Done",
     color: "bg-purple-50 text-purple-700",
     dot: "bg-purple-500",
   },
@@ -178,8 +179,14 @@ export default async function ClientDashboardPage() {
                         </span>
                       )}
                       {project.status === "completed" && !hasRevision && (
-                        <span className="text-xs text-emerald-600 font-medium">
-                          ✓ Submitted
+                        <span className="flex items-center gap-1 text-xs font-medium text-emerald-600">
+                          Ready for review
+                          <ArrowRight className="h-3 w-3" />
+                        </span>
+                      )}
+                      {project.status === "reviewed" && (
+                        <span className="text-xs text-purple-600 font-medium">
+                          ✓ Done
                         </span>
                       )}
                     </div>
