@@ -134,6 +134,7 @@ export type FinalThoughtsFormData = z.infer<typeof finalThoughtsSchema>;
 export const updateProfileSchema = z.object({
   fullName: z.string().min(1, "Full name is required").max(100),
   businessName: z.string().max(100).optional(),
+  brandColor: z.string().regex(/^#[0-9a-fA-F]{6}$/, "Must be a valid hex color").optional().nullable(),
 });
 
 export type UpdateProfileFormData = z.infer<typeof updateProfileSchema>;

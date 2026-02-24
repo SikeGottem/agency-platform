@@ -36,6 +36,16 @@ export async function PATCH(request: NextRequest) {
       updateData.avatar_url = body.avatarUrl;
     }
 
+    // Handle brand color
+    if (result.data.brandColor !== undefined) {
+      updateData.brand_color = result.data.brandColor;
+    }
+
+    // Handle brand logo URL
+    if (body.brandLogoUrl !== undefined) {
+      updateData.brand_logo_url = body.brandLogoUrl;
+    }
+
     const { data: profile, error } = await supabase
       .from("profiles")
       .update(updateData)

@@ -1,378 +1,181 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { ArrowRight, CheckCircle, Zap, Users, Clock, Sparkles, Star, MessageSquare } from "lucide-react";
+import { ArrowRight, FileText, Send, ClipboardCheck, Sparkles } from "lucide-react";
 
 export default function HomePage() {
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-screen flex-col bg-stone-50">
       {/* Header */}
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <header className="sticky top-0 z-50 w-full border-b border-stone-200 bg-stone-50/95 backdrop-blur supports-[backdrop-filter]:bg-stone-50/80">
         <div className="container flex h-16 items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-violet-500 to-purple-600 text-white">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-stone-900 text-white">
               <Sparkles className="h-4 w-4" />
             </div>
-            <span className="font-display text-xl font-bold">Briefed</span>
+            <span className="font-display text-xl font-bold text-stone-900">Briefed</span>
           </div>
           <nav className="hidden md:flex items-center gap-6">
-            <Link href="#features" className="text-sm font-medium hover:text-primary transition-colors">
-              Features
-            </Link>
-            <Link href="#how-it-works" className="text-sm font-medium hover:text-primary transition-colors">
+            <Link href="#how-it-works" className="text-sm font-medium text-stone-600 hover:text-stone-900 transition-colors">
               How It Works
             </Link>
-            <Link href="/pricing" className="text-sm font-medium hover:text-primary transition-colors">
-              Pricing
-            </Link>
-            <Link href="/login" className="text-sm font-medium hover:text-primary transition-colors">
+            <Link href="/login" className="text-sm font-medium text-stone-600 hover:text-stone-900 transition-colors">
               Log In
             </Link>
-            <Button asChild size="sm">
-              <Link href="/signup">Get Started</Link>
+            <Button asChild size="sm" className="bg-stone-900 hover:bg-stone-800">
+              <Link href="/signup">Start Free</Link>
             </Button>
           </nav>
-          <Button asChild size="sm" className="md:hidden">
-            <Link href="/signup">Sign Up</Link>
+          <Button asChild size="sm" className="md:hidden bg-stone-900 hover:bg-stone-800">
+            <Link href="/signup">Start Free</Link>
           </Button>
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="container relative overflow-hidden py-24 md:py-32">
-        <div className="absolute inset-0 -z-10 bg-gradient-to-br from-violet-50 via-purple-50 to-pink-50"></div>
-        <div className="mx-auto max-w-4xl text-center">
-          <Badge variant="secondary" className="mb-4">
-            ✨ Transform client onboarding
-          </Badge>
-          <h1 className="font-display text-4xl font-bold tracking-tight sm:text-6xl md:text-7xl">
-            Turn vague ideas into
-            <span className="bg-gradient-to-br from-violet-600 to-purple-600 bg-clip-text text-transparent">
-              {" "}designer-ready briefs
-            </span>
+      {/* Hero */}
+      <section className="container py-24 md:py-36">
+        <div className="mx-auto max-w-3xl text-center">
+          <p className="mb-4 text-sm font-medium tracking-wide text-stone-500 uppercase">
+            For designers & agencies
+          </p>
+          <h1 className="font-display text-4xl font-bold tracking-tight text-stone-900 sm:text-5xl md:text-6xl leading-[1.1]">
+            Turn client conversations into{" "}
+            <span className="text-stone-500">actionable design briefs</span>
           </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-muted-foreground">
-            Briefed guides your clients through an interactive questionnaire that captures everything you need to create amazing work. No more endless email chains or unclear requirements.
+          <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-stone-600">
+            Stop chasing emails for project details. Send your client one link, get back a structured brief ready to design from.
           </p>
-          <div className="mt-10 flex items-center justify-center gap-4">
-            <Button size="lg" asChild>
+          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3">
+            <Button size="lg" asChild className="bg-stone-900 hover:bg-stone-800 text-base px-8">
               <Link href="/signup">
-                Start Free Trial <ArrowRight className="ml-2 h-4 w-4" />
+                Send Your First Brief <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
-            <Button variant="outline" size="lg" asChild>
-              <Link href="/demo">
-                View Demo
+            <Button variant="outline" size="lg" asChild className="border-stone-300 text-stone-700 hover:bg-stone-100 text-base">
+              <Link href="/login">
+                Log In
               </Link>
             </Button>
           </div>
-          <div className="mt-8 flex items-center justify-center gap-6 text-sm text-muted-foreground">
-            <div className="flex items-center gap-2">
-              <CheckCircle className="h-4 w-4 text-green-500" />
-              No credit card required
-            </div>
-            <div className="flex items-center gap-2">
-              <CheckCircle className="h-4 w-4 text-green-500" />
-              Setup in minutes
-            </div>
-            <div className="flex items-center gap-2">
-              <CheckCircle className="h-4 w-4 text-green-500" />
-              Free forever plan
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section id="features" className="container py-24">
-        <div className="mx-auto max-w-2xl text-center mb-16">
-          <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
-            Everything you need for perfect briefs
-          </h2>
-          <p className="mt-4 text-lg text-muted-foreground">
-            Smart questionnaires that adapt to each project type and capture all the details that matter.
+          <p className="mt-4 text-sm text-stone-400">
+            Free to start · No credit card required
           </p>
-        </div>
-        
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-          <Card className="relative overflow-hidden">
-            <CardHeader>
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-violet-100">
-                <MessageSquare className="h-6 w-6 text-violet-600" />
-              </div>
-              <CardTitle>Interactive Questionnaires</CardTitle>
-              <CardDescription>
-                Dynamic forms that guide clients through the briefing process step-by-step
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-green-500" />
-                  Smart branching logic
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-green-500" />
-                  Visual style selectors
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-green-500" />
-                  File upload support
-                </li>
-              </ul>
-            </CardContent>
-          </Card>
-
-          <Card className="relative overflow-hidden">
-            <CardHeader>
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100">
-                <Zap className="h-6 w-6 text-blue-600" />
-              </div>
-              <CardTitle>Project Templates</CardTitle>
-              <CardDescription>
-                Pre-built templates for branding, web design, and social media projects
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-green-500" />
-                  Customizable templates
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-green-500" />
-                  Industry-specific questions
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-green-500" />
-                  Save as new templates
-                </li>
-              </ul>
-            </CardContent>
-          </Card>
-
-          <Card className="relative overflow-hidden">
-            <CardHeader>
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-green-100">
-                <Clock className="h-6 w-6 text-green-600" />
-              </div>
-              <CardTitle>Automated Workflow</CardTitle>
-              <CardDescription>
-                Send links, track progress, and get notifications when briefs are complete
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-green-500" />
-                  Magic link sharing
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-green-500" />
-                  Real-time progress tracking
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-green-500" />
-                  Email notifications
-                </li>
-              </ul>
-            </CardContent>
-          </Card>
-
-          <Card className="relative overflow-hidden">
-            <CardHeader>
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-purple-100">
-                <Users className="h-6 w-6 text-purple-600" />
-              </div>
-              <CardTitle>Client Experience</CardTitle>
-              <CardDescription>
-                Beautiful, mobile-friendly interface that clients actually want to use
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-green-500" />
-                  Mobile responsive
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-green-500" />
-                  Save & resume progress
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-green-500" />
-                  No account required
-                </li>
-              </ul>
-            </CardContent>
-          </Card>
-
-          <Card className="relative overflow-hidden">
-            <CardHeader>
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-pink-100">
-                <Sparkles className="h-6 w-6 text-pink-600" />
-              </div>
-              <CardTitle>Professional Output</CardTitle>
-              <CardDescription>
-                Export beautiful PDF briefs or view organized responses in your dashboard
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-green-500" />
-                  PDF generation
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-green-500" />
-                  Structured data export
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-green-500" />
-                  Project management
-                </li>
-              </ul>
-            </CardContent>
-          </Card>
-
-          <Card className="relative overflow-hidden">
-            <CardHeader>
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-amber-100">
-                <Star className="h-6 w-6 text-amber-600" />
-              </div>
-              <CardTitle>Analytics & Insights</CardTitle>
-              <CardDescription>
-                Track completion rates and optimize your onboarding process
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-green-500" />
-                  Completion tracking
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-green-500" />
-                  Response analytics
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-green-500" />
-                  Performance insights
-                </li>
-              </ul>
-            </CardContent>
-          </Card>
         </div>
       </section>
 
       {/* How It Works */}
-      <section id="how-it-works" className="container py-24 bg-muted/30">
-        <div className="mx-auto max-w-2xl text-center mb-16">
-          <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
-            How Briefed Works
-          </h2>
-          <p className="mt-4 text-lg text-muted-foreground">
-            Get from first contact to detailed brief in three simple steps
-          </p>
-        </div>
+      <section id="how-it-works" className="border-y border-stone-200 bg-white py-24">
+        <div className="container">
+          <div className="mx-auto max-w-2xl text-center mb-16">
+            <h2 className="font-display text-3xl font-bold tracking-tight text-stone-900 sm:text-4xl">
+              Three steps. One perfect brief.
+            </h2>
+            <p className="mt-4 text-lg text-stone-500">
+              From first contact to design-ready in minutes, not days.
+            </p>
+          </div>
 
-        <div className="mx-auto max-w-4xl">
-          <div className="grid gap-8 md:grid-cols-3">
+          <div className="mx-auto max-w-4xl grid gap-12 md:grid-cols-3 md:gap-8">
+            {/* Step 1 */}
             <div className="text-center">
-              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                <span className="text-2xl font-bold">1</span>
+              <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-stone-100">
+                <FileText className="h-6 w-6 text-stone-700" />
               </div>
-              <h3 className="mb-2 text-xl font-semibold">Create Project</h3>
-              <p className="text-muted-foreground">
-                Set up a new project with your client's info and choose the right template for their needs
+              <div className="mb-2 text-xs font-semibold tracking-wider text-stone-400 uppercase">Step 1</div>
+              <h3 className="mb-2 text-xl font-semibold text-stone-900">Create</h3>
+              <p className="text-stone-500 leading-relaxed">
+                Set up a project and pick a questionnaire template — branding, web, or custom.
               </p>
             </div>
+
+            {/* Step 2 */}
             <div className="text-center">
-              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                <span className="text-2xl font-bold">2</span>
+              <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-stone-100">
+                <Send className="h-6 w-6 text-stone-700" />
               </div>
-              <h3 className="mb-2 text-xl font-semibold">Send Link</h3>
-              <p className="text-muted-foreground">
-                Share a magic link with your client. They complete the brief at their own pace, no account needed
+              <div className="mb-2 text-xs font-semibold tracking-wider text-stone-400 uppercase">Step 2</div>
+              <h3 className="mb-2 text-xl font-semibold text-stone-900">Send</h3>
+              <p className="text-stone-500 leading-relaxed">
+                Share a magic link with your client. They fill it out at their own pace — no account needed.
               </p>
             </div>
+
+            {/* Step 3 */}
             <div className="text-center">
-              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                <span className="text-2xl font-bold">3</span>
+              <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-stone-100">
+                <ClipboardCheck className="h-6 w-6 text-stone-700" />
               </div>
-              <h3 className="mb-2 text-xl font-semibold">Get Perfect Brief</h3>
-              <p className="text-muted-foreground">
-                Receive organized responses and export professional PDFs. Start creating with confidence
+              <div className="mb-2 text-xs font-semibold tracking-wider text-stone-400 uppercase">Step 3</div>
+              <h3 className="mb-2 text-xl font-semibold text-stone-900">Brief</h3>
+              <p className="text-stone-500 leading-relaxed">
+                Get a structured, designer-ready brief with style preferences, goals, and everything you need.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
+      {/* Why Briefed */}
       <section className="container py-24">
-        <div className="mx-auto max-w-2xl text-center">
-          <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
-            Ready to streamline your client onboarding?
+        <div className="mx-auto max-w-2xl">
+          <h2 className="font-display text-2xl font-bold text-stone-900 mb-8 text-center sm:text-3xl">
+            Why designers use Briefed
           </h2>
-          <p className="mt-4 text-lg text-muted-foreground">
-            Join hundreds of designers who have transformed their briefing process with Briefed
+          <div className="space-y-6">
+            {[
+              { title: "No more email chains", desc: "One link replaces weeks of back-and-forth trying to extract project requirements." },
+              { title: "Clients actually finish it", desc: "Interactive, mobile-friendly questionnaires with auto-save. Clients can pause and come back." },
+              { title: "Visual style capture", desc: "Built-in style selectors help clients show what they like — not just tell you." },
+              { title: "Professional PDF briefs", desc: "Export clean, branded briefs you can reference throughout the project." },
+              { title: "Your brand, your experience", desc: "Custom colors, logo, and business name on every client touchpoint." },
+            ].map((item) => (
+              <div key={item.title} className="flex gap-4">
+                <div className="mt-1 h-2 w-2 rounded-full bg-stone-400 flex-shrink-0" />
+                <div>
+                  <h3 className="font-semibold text-stone-900">{item.title}</h3>
+                  <p className="text-stone-500 mt-0.5">{item.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="border-t border-stone-200 bg-stone-900 py-20">
+        <div className="container mx-auto max-w-2xl text-center">
+          <h2 className="font-display text-3xl font-bold tracking-tight text-white sm:text-4xl">
+            Ready to streamline your briefs?
+          </h2>
+          <p className="mt-4 text-lg text-stone-400">
+            Join designers who spend less time chasing details and more time creating.
           </p>
-          <div className="mt-8 flex items-center justify-center gap-4">
-            <Button size="lg" asChild>
+          <div className="mt-8">
+            <Button size="lg" asChild className="bg-white text-stone-900 hover:bg-stone-100 text-base px-8">
               <Link href="/signup">
-                Start Your Free Trial <ArrowRight className="ml-2 h-4 w-4" />
+                Start Free <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
           </div>
-          <p className="mt-4 text-sm text-muted-foreground">
-            No commitment. Cancel anytime. Free plan available forever.
-          </p>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t bg-muted/30">
-        <div className="container py-12">
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-gradient-to-br from-violet-500 to-purple-600 text-white">
-                  <Sparkles className="h-3 w-3" />
-                </div>
-                <span className="font-display font-bold">Briefed</span>
+      <footer className="border-t border-stone-200 bg-stone-50">
+        <div className="container py-8">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <div className="flex h-6 w-6 items-center justify-center rounded bg-stone-900 text-white">
+                <Sparkles className="h-3 w-3" />
               </div>
-              <p className="text-sm text-muted-foreground">
-                Transform client onboarding with interactive briefing questionnaires.
-              </p>
+              <span className="font-display font-semibold text-stone-900">Briefed</span>
             </div>
-            <div>
-              <h4 className="font-semibold mb-4">Product</h4>
-              <ul className="space-y-2 text-sm">
-                <li><Link href="#features" className="text-muted-foreground hover:text-primary">Features</Link></li>
-                <li><Link href="/pricing" className="text-muted-foreground hover:text-primary">Pricing</Link></li>
-                <li><Link href="/demo" className="text-muted-foreground hover:text-primary">Demo</Link></li>
-              </ul>
+            <div className="flex items-center gap-6 text-sm text-stone-500">
+              <Link href="/login" className="hover:text-stone-900 transition-colors">Log In</Link>
+              <Link href="/signup" className="hover:text-stone-900 transition-colors">Sign Up</Link>
+              <Link href="/privacy" className="hover:text-stone-900 transition-colors">Privacy</Link>
+              <Link href="/terms" className="hover:text-stone-900 transition-colors">Terms</Link>
             </div>
-            <div>
-              <h4 className="font-semibold mb-4">Account</h4>
-              <ul className="space-y-2 text-sm">
-                <li><Link href="/login" className="text-muted-foreground hover:text-primary">Log In</Link></li>
-                <li><Link href="/signup" className="text-muted-foreground hover:text-primary">Sign Up</Link></li>
-                <li><Link href="/dashboard" className="text-muted-foreground hover:text-primary">Dashboard</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">Legal</h4>
-              <ul className="space-y-2 text-sm">
-                <li><Link href="/privacy" className="text-muted-foreground hover:text-primary">Privacy</Link></li>
-                <li><Link href="/terms" className="text-muted-foreground hover:text-primary">Terms</Link></li>
-              </ul>
-            </div>
-          </div>
-          <div className="mt-12 border-t pt-8 text-center text-sm text-muted-foreground">
-            <p>&copy; 2024 Briefed. All rights reserved.</p>
+            <p className="text-sm text-stone-400">&copy; {new Date().getFullYear()} Briefed</p>
           </div>
         </div>
       </footer>

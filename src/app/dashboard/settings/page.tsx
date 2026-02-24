@@ -43,6 +43,8 @@ export default async function SettingsPage() {
             email: user.email ?? "",
             planTier: profile?.plan_tier ?? "free",
             userId: user.id,
+            brandColor: profile?.brand_color ?? "",
+            brandLogoUrl: profile?.brand_logo_url ?? "",
           }}
         />
       </div>
