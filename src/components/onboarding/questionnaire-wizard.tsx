@@ -627,18 +627,18 @@ export function QuestionnaireWizard({
 
       {/* Navigation (for last step: submit button) */}
       {currentStep === steps.length - 1 && (
-        <div className="mt-6 flex justify-between gap-3">
+        <div className="mt-6 flex flex-col sm:flex-row justify-between gap-3">
           <Button
             variant="outline"
             onClick={handlePrevWithTransition}
-            className="h-11 sm:h-10 active:scale-95 transition-transform"
+            className="h-12 w-full sm:w-auto active:scale-95 transition-transform"
           >
             <ArrowLeft className="mr-2 h-4 w-4" /> Back
           </Button>
           <Button
             onClick={handleSubmit}
             disabled={isSaving}
-            className="h-11 sm:h-10 active:scale-95 transition-transform"
+            className="h-12 w-full sm:w-auto active:scale-95 transition-transform"
           >
             {isSaving ? "Submitting..." : "Submit Brief"}
           </Button>

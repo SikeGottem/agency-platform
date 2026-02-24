@@ -211,6 +211,7 @@ export function InspirationUploadStep({ projectId, data, onSave, onNext, onPrev,
             ref={fileInputRef}
             type="file"
             accept="image/png,image/jpeg,image/gif,image/webp"
+            capture="environment"
             multiple
             className="hidden"
             onChange={(e) => {
@@ -261,7 +262,7 @@ export function InspirationUploadStep({ projectId, data, onSave, onNext, onPrev,
                 <button
                   type="button"
                   onClick={() => handleDeleteImage(image.id)}
-                  className="absolute top-1.5 right-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-destructive text-destructive-foreground opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
+                  className="absolute top-1.5 right-1.5 flex h-8 w-8 items-center justify-center rounded-full bg-destructive text-destructive-foreground opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity shadow-sm"
                 >
                   <X className="h-3 w-3" />
                 </button>
@@ -270,7 +271,7 @@ export function InspirationUploadStep({ projectId, data, onSave, onNext, onPrev,
                     value={image.note}
                     onChange={(e) => updateImageNote(image.id, e.target.value)}
                     placeholder="What do you like about this?"
-                    className="h-7 text-xs"
+                    className="h-11 text-base sm:text-xs"
                   />
                 </div>
               </div>
@@ -292,14 +293,14 @@ export function InspirationUploadStep({ projectId, data, onSave, onNext, onPrev,
                 value={url}
                 onChange={(e) => setUrls((prev) => prev.map((u, i) => (i === index ? e.target.value : u)))}
                 placeholder="https://example.com"
-                className="h-10"
+                className="h-11 text-base"
               />
               {urls.length > 1 && (
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={() => setUrls((prev) => prev.filter((_, i) => i !== index))}
-                  className="h-10 w-10"
+                  className="h-11 w-11"
                 >
                   <X className="h-4 w-4" />
                 </Button>
@@ -327,7 +328,7 @@ export function InspirationUploadStep({ projectId, data, onSave, onNext, onPrev,
           onChange={(e) => setNotes(e.target.value)}
           placeholder="Tell us what catches your eye — colors, layouts, typography, overall feel..."
           rows={4}
-          className="resize-none"
+          className="resize-none text-base"
         />
       </div>
 

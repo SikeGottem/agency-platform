@@ -188,7 +188,7 @@ export function TimelineBudgetStep({ data, onSave, onNext, onPrev }: StepProps) 
                 type="button"
                 onClick={() => { setError(null); setBudgetRange(opt.value); }}
                 className={cn(
-                  "px-4 py-2 rounded-full text-sm font-medium border transition-all duration-200",
+                  "px-4 py-2.5 rounded-full text-sm font-medium border transition-all duration-200 min-h-[44px]",
                   "hover:scale-[1.02] active:scale-[0.98]",
                   isSelected
                     ? "bg-primary text-primary-foreground border-primary shadow-sm"
@@ -261,7 +261,7 @@ export function TimelineBudgetStep({ data, onSave, onNext, onPrev }: StepProps) 
                     size="sm"
                     onClick={() => movePriority(index, "up")}
                     disabled={index === 0}
-                    className="h-8 w-8 p-0"
+                    className="h-11 w-11 p-0"
                   >
                     ↑
                   </Button>
@@ -270,7 +270,7 @@ export function TimelineBudgetStep({ data, onSave, onNext, onPrev }: StepProps) 
                     size="sm"
                     onClick={() => movePriority(index, "down")}
                     disabled={index === priorities.length - 1}
-                    className="h-8 w-8 p-0"
+                    className="h-11 w-11 p-0"
                   >
                     ↓
                   </Button>

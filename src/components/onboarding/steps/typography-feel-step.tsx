@@ -196,7 +196,7 @@ export function TypographyFeelStep({ data, onSave, onNext, onPrev, allResponses,
         {COMPARISONS.map((comp) => (
           <div key={comp.id} className="space-y-2">
             <p className="text-sm text-muted-foreground">{comp.question}</p>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {[
                 { key: "A", opt: comp.optionA },
                 { key: "B", opt: comp.optionB },
@@ -355,7 +355,7 @@ export function TypographyFeelStep({ data, onSave, onNext, onPrev, allResponses,
           onChange={(e) => setAdditionalNotes(e.target.value)}
           placeholder="e.g., 'Prefer fonts that feel approachable but professional' or 'Avoid anything too trendy'"
           rows={3}
-          className="resize-none"
+          className="resize-none text-base"
         />
       </div>
 

@@ -75,6 +75,7 @@ export function CustomQuestionsStep({
                 value={(answers[q.label] as string) ?? ""}
                 onChange={(e) => setValue(q.label, e.target.value)}
                 placeholder={`Enter your answer`}
+                className="h-11 text-base"
               />
             )}
             {q.type === "textarea" && (
@@ -83,6 +84,7 @@ export function CustomQuestionsStep({
                 onChange={(e) => setValue(q.label, e.target.value)}
                 placeholder={`Enter your answer`}
                 rows={3}
+                className="text-base"
               />
             )}
             {q.type === "select" && q.options && (
@@ -92,7 +94,7 @@ export function CustomQuestionsStep({
                     key={opt}
                     type="button"
                     variant={answers[q.label] === opt ? "default" : "outline"}
-                    size="sm"
+                    className="h-11 px-4 text-sm"
                     onClick={() => setValue(q.label, opt)}
                   >
                     {opt}
@@ -109,7 +111,7 @@ export function CustomQuestionsStep({
                       key={opt}
                       type="button"
                       variant={selected ? "default" : "outline"}
-                      size="sm"
+                      className="h-11 px-4 text-sm"
                       onClick={() => toggleMulti(q.label, opt)}
                     >
                       {opt}
@@ -121,11 +123,11 @@ export function CustomQuestionsStep({
           </div>
         ))}
 
-        <div className="flex justify-between pt-4">
-          <Button variant="outline" onClick={onPrev}>
+        <div className="flex flex-col sm:flex-row justify-between gap-3 pt-4">
+          <Button variant="outline" onClick={onPrev} className="h-12 w-full sm:w-auto px-6">
             <ArrowLeft className="mr-2 h-4 w-4" /> Back
           </Button>
-          <Button onClick={handleNext}>
+          <Button onClick={handleNext} className="h-12 w-full sm:w-auto px-8">
             Next <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </div>

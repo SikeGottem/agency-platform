@@ -226,7 +226,7 @@ export function ColorPreferencesStep({ data, onSave, onNext, onPrev, allResponse
         <h3 className="mb-3 text-sm font-medium">
           Pick palettes you like (select any that appeal to you)
         </h3>
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+        <div className="grid grid-cols-1 xs:grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
           {sortedPalettes.map((palette) => {
             const isSelected = selectedPalettes.includes(palette.name);
             const rec = paletteRecs.find(r => r.name === palette.name);

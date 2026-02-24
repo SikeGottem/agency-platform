@@ -365,6 +365,7 @@ export function ProjectScopeStep({
           type="file"
           multiple
           accept="image/*,.pdf,.ai,.eps,.svg,.psd,.sketch,.fig"
+          capture="environment"
           onChange={handleFileUpload}
           className="hidden"
           data-testid="file-input"
@@ -416,7 +417,7 @@ export function ProjectScopeStep({
                 <button
                   type="button"
                   onClick={() => removeAsset(index)}
-                  className="absolute top-1 right-1 w-6 h-6 rounded-full bg-black/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="absolute top-1 right-1 w-8 h-8 rounded-full bg-black/60 text-white flex items-center justify-center opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
                   data-testid={`remove-asset-${index}`}
                 >
                   <X className="h-3.5 w-3.5" />
@@ -428,16 +429,16 @@ export function ProjectScopeStep({
       </div>
 
       {/* Navigation */}
-      <div className="flex justify-between pt-4">
+      <div className="flex flex-col sm:flex-row justify-between gap-3 pt-4">
         {!isFirst && (
-          <Button type="button" variant="outline" onClick={onPrev} className="h-12 px-6">
+          <Button type="button" variant="outline" onClick={onPrev} className="h-12 w-full sm:w-auto px-6">
             <ArrowLeft className="mr-2 h-4 w-4" /> Back
           </Button>
         )}
         <Button
           type="button"
           onClick={handleNext}
-          className={cn("h-12 px-8", isFirst && "ml-auto")}
+          className={cn("h-12 w-full sm:w-auto px-8", isFirst && "sm:ml-auto")}
           data-testid="next-button"
         >
           Next <ArrowRight className="ml-2 h-4 w-4" />

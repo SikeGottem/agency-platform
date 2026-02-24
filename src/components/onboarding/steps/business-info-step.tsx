@@ -345,7 +345,7 @@ export function BusinessInfoStep({ data, onSave, onNext, onPrev, isFirst }: Step
                 type="button"
                 onClick={() => toggleAudience(audience)}
                 className={cn(
-                  "px-3 py-1.5 rounded-full text-sm font-medium border transition-all duration-200",
+                  "px-3 py-2 rounded-full text-sm font-medium border transition-all duration-200 min-h-[44px]",
                   "hover:scale-[1.02] active:scale-[0.98]",
                   selected
                     ? "bg-primary text-primary-foreground border-primary shadow-sm"
@@ -386,7 +386,7 @@ export function BusinessInfoStep({ data, onSave, onNext, onPrev, isFirst }: Step
                 addCustomAudience();
               }
             }}
-            className="h-10"
+            className="h-11 text-base"
             data-testid="custom-audience-input"
           />
           <Button
@@ -394,7 +394,7 @@ export function BusinessInfoStep({ data, onSave, onNext, onPrev, isFirst }: Step
             variant="outline"
             size="sm"
             onClick={addCustomAudience}
-            className="h-10 px-3"
+            className="h-11 px-3"
           >
             <Plus className="h-4 w-4" />
           </Button>
@@ -423,7 +423,7 @@ export function BusinessInfoStep({ data, onSave, onNext, onPrev, isFirst }: Step
                       placeholder={`Brand name ${index + 1}`}
                       value={comp.name}
                       onChange={(e) => updateCompetitor(index, "name", e.target.value)}
-                      className="h-10"
+                      className="h-11 text-base"
                       data-testid={`competitor-name-${index}`}
                     />
                     <div className="flex items-center gap-2">
@@ -432,7 +432,7 @@ export function BusinessInfoStep({ data, onSave, onNext, onPrev, isFirst }: Step
                         placeholder="Website URL (optional)"
                         value={comp.url}
                         onChange={(e) => updateCompetitor(index, "url", e.target.value)}
-                        className="h-9 text-sm"
+                        className="h-11 text-base sm:text-sm"
                         data-testid={`competitor-url-${index}`}
                       />
                     </div>
@@ -467,16 +467,16 @@ export function BusinessInfoStep({ data, onSave, onNext, onPrev, isFirst }: Step
       </div>
 
       {/* Navigation */}
-      <div className="flex justify-between pt-4">
+      <div className="flex flex-col sm:flex-row justify-between gap-3 pt-4">
         {!isFirst && (
-          <Button type="button" variant="outline" onClick={onPrev} className="h-12 px-6">
+          <Button type="button" variant="outline" onClick={onPrev} className="h-12 w-full sm:w-auto px-6">
             <ArrowLeft className="mr-2 h-4 w-4" /> Back
           </Button>
         )}
         <Button
           type="button"
           onClick={handleNext}
-          className={cn("h-12 px-8", isFirst && "ml-auto")}
+          className={cn("h-12 w-full sm:w-auto px-8", isFirst && "sm:ml-auto")}
           data-testid="next-button"
         >
           Next <ArrowRight className="ml-2 h-4 w-4" />

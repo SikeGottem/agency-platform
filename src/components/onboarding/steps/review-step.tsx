@@ -42,7 +42,7 @@ function Section({ title, stepKey, goToStep, children }: SectionProps) {
             variant="ghost"
             size="sm"
             onClick={() => goToStep(stepKey)}
-            className="text-xs h-7"
+            className="text-xs h-11 px-3"
           >
             <Pencil className="mr-1 h-3 w-3" /> Edit
           </Button>

@@ -272,7 +272,7 @@ export function StyleDirectionStep({ data, onSave, onNext, onPrev }: StepProps) 
                 onClick={() => toggleAntiInspiration(style)}
                 disabled={isSelected}
                 className={cn(
-                  "px-3 py-1.5 rounded-full text-sm font-medium border transition-all duration-200",
+                  "px-3 py-2 rounded-full text-sm font-medium border transition-all duration-200 min-h-[44px]",
                   "hover:scale-[1.02] active:scale-[0.98]",
                   isAnti
                     ? "bg-destructive/10 text-destructive border-destructive"
@@ -306,7 +306,7 @@ export function StyleDirectionStep({ data, onSave, onNext, onPrev }: StepProps) 
                 value={url}
                 onChange={(e) => updateBrandExample(index, e.target.value)}
                 placeholder="https://example.com"
-                className="h-10"
+                className="h-11 text-base"
                 data-testid={`brand-example-input-${index}`}
               />
               {brandExamples.length > 1 && (
@@ -315,7 +315,7 @@ export function StyleDirectionStep({ data, onSave, onNext, onPrev }: StepProps) 
                   variant="ghost"
                   size="icon"
                   onClick={() => removeBrandExample(index)}
-                  className="h-10 w-10"
+                  className="h-11 w-11"
                   data-testid={`remove-brand-example-${index}`}
                 >
                   <X className="h-4 w-4" />
