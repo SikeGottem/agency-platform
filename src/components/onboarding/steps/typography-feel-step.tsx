@@ -228,6 +228,21 @@ export function TypographyFeelStep({ data, onSave, onNext, onPrev, allResponses,
                 );
               })}
             </div>
+            {/* No preference option */}
+            <div className="col-span-2 text-center">
+              <button
+                type="button"
+                onClick={() => setComparisons((prev) => ({ ...prev, [comp.id]: "none" }))}
+                className={cn(
+                  "text-xs text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5 rounded-full border border-dashed",
+                  comparisons[comp.id] === "none"
+                    ? "border-primary text-primary bg-primary/5"
+                    : "border-border/50"
+                )}
+              >
+                I don&apos;t have a preference
+              </button>
+            </div>
           </div>
         ))}
       </div>
