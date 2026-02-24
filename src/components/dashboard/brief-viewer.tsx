@@ -1,6 +1,7 @@
 "use client";
 
 import type { Json } from "@/types/supabase";
+import type { StructuredBrief, RedFlag, ExecutiveSummary, CreativeDirection, ScopeOfWork, ClientProfile } from "@/lib/brief-generator";
 
 /* ── Constants ── */
 
@@ -197,6 +198,8 @@ function buildContentFromResponses(responses: ResponseRow[]): BriefContentData {
 export function BriefViewer({ content, assetUrls, responses }: BriefViewerProps) {
   // The generated brief stores questionnaire data under `rawResponses`, not `responses`
   const rawContent = content as Record<string, unknown> | null;
+  const isV3 = rawContent?.version === 3;
+  const v3Brief = isV3 ? (rawContent as unknown as StructuredBrief) : null;
   const brief: BriefContentData = rawContent
     ? {
         ...rawContent,
@@ -247,6 +250,17 @@ export function BriefViewer({ content, assetUrls, responses }: BriefViewerProps)
             &ldquo;{directorSummary}&rdquo;
           </p>
         </section>
+      )}
+
+      {/* ── V3 Structured Sections ── */}
+      {v3Brief && (
+        <>
+          <ExecutiveSummarySection data={v3Brief.executiveSummary} confidenceScore={v3Brief.confidenceScore} />
+          <CreativeDirectionSection data={v3Brief.creativeDirection} />
+          <ScopeOfWorkSection data={v3Brief.scopeOfWork} />
+          <ClientProfileSection data={v3Brief.clientProfile} />
+          <RedFlagsSection flags={v3Brief.redFlags} />
+        </>
       )}
 
       {/* ── Style Direction ── */}
@@ -605,5 +619,318 @@ function SectionHeader({ title }: { title: string }) {
       <h2 className="font-[family-name:var(--font-display)] text-xl font-semibold text-stone-900">{title}</h2>
       <div className="flex-1 h-px bg-stone-200" />
     </div>
+  );
+}
+
+/* ── V3 Structured Sections ── */
+
+function ExecutiveSummarySection({ data, confidenceScore }: { data: ExecutiveSummary; confidenceScore: string }) {
+  const gradeColors: Record<string, string> = {
+    A: "bg-emerald-100 text-emerald-800 border-emerald-200",
+    B: "bg-amber-100 text-amber-800 border-amber-200",
+    C: "bg-red-100 text-red-800 border-red-200",
+  };
+  const gradeLabels: Record<string, string> = {
+    A: "Well-defined brief",
+    B: "Some areas need clarification",
+    C: "Needs significant follow-up",
+  };
+
+  return (
+    <section className="mb-8 rounded-2xl border-2 border-[#E05252]/20 bg-gradient-to-br from-[#FAF7F2] to-white p-8 md:p-10">
+      <div className="flex items-start justify-between gap-4 mb-5">
+        <div>
+          <p className="text-xs font-medium tracking-[0.2em] uppercase text-stone-400 mb-2">Executive Summary</p>
+        </div>
+        <div className={`px-3 py-1 text-xs font-semibold rounded-full border ${gradeColors[confidenceScore] || gradeColors.B}`}>
+          Grade {confidenceScore} — {gradeLabels[confidenceScore] || ""}
+        </div>
+      </div>
+      <p className="text-stone-700 leading-relaxed text-base mb-6">{data.overview}</p>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="text-center p-4 rounded-xl bg-white border border-stone-200/60">
+          <p className="text-xs font-medium tracking-wider uppercase text-stone-400 mb-1">Deliverables</p>
+          <p className="text-2xl font-bold text-stone-900">{data.keyDeliverables.length || "TBD"}</p>
+        </div>
+        <div className="text-center p-4 rounded-xl bg-white border border-stone-200/60">
+          <p className="text-xs font-medium tracking-wider uppercase text-stone-400 mb-1">Timeline</p>
+          <p className="text-lg font-semibold text-stone-900">{data.timeline}</p>
+        </div>
+        <div className="text-center p-4 rounded-xl bg-white border border-stone-200/60">
+          <p className="text-xs font-medium tracking-wider uppercase text-stone-400 mb-1">Budget</p>
+          <p className="text-lg font-semibold text-stone-900">{data.budget}</p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function CreativeDirectionSection({ data }: { data: CreativeDirection }) {
+  return (
+    <section className="mb-8">
+      <SectionHeader title="Creative Direction" />
+      
+      {/* Style Profile */}
+      <div className="rounded-xl border border-stone-200/60 bg-[#FAF7F2] p-6 mb-4">
+        <p className="text-xs font-medium tracking-[0.15em] uppercase text-stone-400 mb-3">Style Profile</p>
+        <p className="text-stone-700 leading-relaxed">{data.styleProfile}</p>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        {/* Mood Keywords */}
+        {data.moodKeywords.length > 0 && (
+          <div className="rounded-xl border border-stone-200/60 bg-[#FAF7F2] p-6">
+            <p className="text-xs font-medium tracking-[0.15em] uppercase text-stone-400 mb-3">Mood & Tone</p>
+            <div className="flex flex-wrap gap-2">
+              {data.moodKeywords.map(kw => (
+                <span key={kw} className="px-3 py-1.5 text-sm font-medium bg-stone-900 text-white rounded-full">{kw}</span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Avoid */}
+        {data.avoidKeywords.length > 0 && (
+          <div className="rounded-xl border border-red-200/60 bg-red-50/50 p-6">
+            <p className="text-xs font-medium tracking-[0.15em] uppercase text-red-400 mb-3">Avoid</p>
+            <div className="flex flex-wrap gap-2">
+              {data.avoidKeywords.map(kw => (
+                <span key={kw} className="px-3 py-1.5 text-sm font-medium bg-white text-red-600 border border-red-200 rounded-full">{kw}</span>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Font Recommendations */}
+      {data.fontRecommendations.length > 0 && (
+        <div className="space-y-3 mb-4">
+          <p className="text-xs font-medium tracking-[0.15em] uppercase text-stone-400">Font Recommendations</p>
+          {data.fontRecommendations.map(font => (
+            <div key={font.category} className="rounded-xl border border-stone-200/60 bg-[#FAF7F2] p-5 flex flex-col sm:flex-row sm:items-center gap-3">
+              <div className="shrink-0">
+                <span className="px-3 py-1 text-xs font-semibold bg-[#E05252] text-white rounded-full capitalize">{font.category}</span>
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-stone-900">{font.suggestion}</p>
+                <p className="text-xs text-stone-500">{font.rationale}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Color Palette with Roles */}
+      {data.colorPalette.length > 0 && (
+        <div>
+          <p className="text-xs font-medium tracking-[0.15em] uppercase text-stone-400 mb-3">Color Palette</p>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {data.colorPalette.map(color => (
+              <div key={color.hex + color.name} className="group">
+                <div
+                  className="aspect-[4/3] rounded-xl shadow-sm flex flex-col items-center justify-end p-3 transition-transform hover:scale-[1.02]"
+                  style={{ backgroundColor: color.hex, color: contrastColor(color.hex) }}
+                >
+                  <span className="text-[10px] font-semibold uppercase tracking-wider opacity-70 mb-1">{color.role}</span>
+                  <span className="text-sm font-semibold opacity-90">{color.name}</span>
+                  <span className="text-[11px] font-mono opacity-70">{color.hex}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}
+
+function ScopeOfWorkSection({ data }: { data: ScopeOfWork }) {
+  return (
+    <section className="mb-8">
+      <SectionHeader title="Scope of Work" />
+
+      {/* Deliverables */}
+      {data.deliverables.length > 0 && (
+        <div className="rounded-xl border border-stone-200/60 bg-[#FAF7F2] p-6 mb-4">
+          <p className="text-xs font-medium tracking-[0.15em] uppercase text-stone-400 mb-4">Deliverables</p>
+          <div className="space-y-3">
+            {data.deliverables.map((d, i) => (
+              <div key={i} className="flex items-start gap-3 pb-3 border-b border-stone-200/40 last:border-0 last:pb-0">
+                <span className="w-6 h-6 rounded-full bg-[#E05252] text-white text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">{i + 1}</span>
+                <div>
+                  <p className="text-sm font-semibold text-stone-900">{d.item}</p>
+                  <p className="text-xs text-stone-500">{d.specification}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        {/* Inclusions */}
+        <div className="rounded-xl border border-emerald-200/60 bg-emerald-50/50 p-6">
+          <p className="text-xs font-medium tracking-[0.15em] uppercase text-emerald-600 mb-3">What&apos;s Included</p>
+          <ul className="space-y-2">
+            {data.inclusions.map((item, i) => (
+              <li key={i} className="flex items-start gap-2 text-sm text-stone-700">
+                <span className="text-emerald-500 mt-0.5">✓</span>
+                {item}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Exclusions */}
+        <div className="rounded-xl border border-stone-200/60 bg-stone-50 p-6">
+          <p className="text-xs font-medium tracking-[0.15em] uppercase text-stone-400 mb-3">Not Included</p>
+          <ul className="space-y-2">
+            {data.exclusions.map((item, i) => (
+              <li key={i} className="flex items-start gap-2 text-sm text-stone-500">
+                <span className="text-stone-400 mt-0.5">✕</span>
+                {item}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      {/* Revision rounds */}
+      <div className="flex items-center gap-3 mb-4 px-1">
+        <span className="text-xs font-medium text-stone-400 uppercase tracking-wider">Revision Rounds:</span>
+        <span className="px-3 py-1 text-sm font-semibold bg-stone-900 text-white rounded-full">{data.revisionRounds}</span>
+      </div>
+
+      {/* Timeline Milestones */}
+      {data.milestones.length > 0 && (
+        <div className="rounded-xl border border-stone-200/60 bg-[#FAF7F2] p-6">
+          <p className="text-xs font-medium tracking-[0.15em] uppercase text-stone-400 mb-4">Timeline & Milestones</p>
+          <div className="space-y-0">
+            {data.milestones.map((m, i) => (
+              <div key={i} className="flex items-start gap-4 relative pb-6 last:pb-0">
+                {/* Timeline line */}
+                {i < data.milestones.length - 1 && (
+                  <div className="absolute left-[11px] top-6 bottom-0 w-px bg-stone-300" />
+                )}
+                <div className="w-6 h-6 rounded-full border-2 border-[#E05252] bg-white flex items-center justify-center shrink-0 z-10">
+                  <div className="w-2 h-2 rounded-full bg-[#E05252]" />
+                </div>
+                <div className="flex-1 -mt-0.5">
+                  <div className="flex items-baseline gap-2 flex-wrap">
+                    <p className="text-sm font-semibold text-stone-900">{m.phase}</p>
+                    <span className="text-xs text-[#E05252] font-medium">{m.weekRange}</span>
+                  </div>
+                  <p className="text-xs text-stone-500 mt-0.5">{m.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}
+
+function ClientProfileSection({ data }: { data: ClientProfile }) {
+  return (
+    <section className="mb-8">
+      <SectionHeader title="Client Profile" />
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {/* Business */}
+        <div className="rounded-xl border border-stone-200/60 bg-[#FAF7F2] p-6 sm:col-span-2">
+          <p className="text-xs font-medium tracking-[0.15em] uppercase text-stone-400 mb-2">Business Description</p>
+          <p className="text-sm text-stone-700 leading-relaxed">{data.businessDescription}</p>
+          {data.industry !== "Not specified" && (
+            <span className="inline-block mt-3 px-3 py-1 text-xs font-medium bg-stone-900 text-white rounded-full">{data.industry}</span>
+          )}
+        </div>
+
+        {/* Target Audience */}
+        {data.targetAudience.length > 0 && (
+          <div className="rounded-xl border border-stone-200/60 bg-[#FAF7F2] p-6">
+            <p className="text-xs font-medium tracking-[0.15em] uppercase text-stone-400 mb-3">Target Audience</p>
+            <div className="flex flex-wrap gap-2">
+              {data.targetAudience.map(a => (
+                <span key={a} className="px-3 py-1.5 text-sm font-medium bg-white border border-stone-200 rounded-full text-stone-700">{a}</span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Competitors */}
+        {data.competitors.length > 0 && (
+          <div className="rounded-xl border border-stone-200/60 bg-[#FAF7F2] p-6">
+            <p className="text-xs font-medium tracking-[0.15em] uppercase text-stone-400 mb-3">Competitors</p>
+            <div className="flex flex-wrap gap-2">
+              {data.competitors.map(c => (
+                <span key={c} className="px-3 py-1.5 text-sm font-medium bg-white border border-stone-200 rounded-full text-stone-700">{c}</span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Likes */}
+        {data.likes.length > 0 && (
+          <div className="rounded-xl border border-emerald-200/60 bg-emerald-50/50 p-6">
+            <p className="text-xs font-medium tracking-[0.15em] uppercase text-emerald-600 mb-3">What They Like</p>
+            <div className="flex flex-wrap gap-2">
+              {data.likes.map(l => (
+                <span key={l} className="px-3 py-1.5 text-sm font-medium bg-white border border-emerald-200 rounded-full text-emerald-700">{l}</span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Dislikes */}
+        {data.dislikes.length > 0 && (
+          <div className="rounded-xl border border-red-200/60 bg-red-50/50 p-6">
+            <p className="text-xs font-medium tracking-[0.15em] uppercase text-red-400 mb-3">What They Dislike</p>
+            <div className="flex flex-wrap gap-2">
+              {data.dislikes.map(d => (
+                <span key={d} className="px-3 py-1.5 text-sm font-medium bg-white border border-red-200 rounded-full text-red-600">{d}</span>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function RedFlagsSection({ flags }: { flags: RedFlag[] }) {
+  if (flags.length === 0) return null;
+
+  const severityConfig: Record<string, { bg: string; border: string; icon: string; label: string }> = {
+    critical: { bg: "bg-red-50", border: "border-red-200", icon: "🚨", label: "Critical" },
+    warning: { bg: "bg-amber-50", border: "border-amber-200", icon: "⚠️", label: "Warning" },
+    info: { bg: "bg-blue-50", border: "border-blue-200", icon: "💡", label: "Note" },
+  };
+
+  return (
+    <section className="mb-8">
+      <SectionHeader title="Red Flags & Notes" />
+      <div className="space-y-3">
+        {flags.map((flag, i) => {
+          const config = severityConfig[flag.severity] || severityConfig.info;
+          return (
+            <div key={i} className={`rounded-xl border ${config.border} ${config.bg} p-5`}>
+              <div className="flex items-start gap-3">
+                <span className="text-lg shrink-0">{config.icon}</span>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className={`text-[10px] font-bold uppercase tracking-wider ${
+                      flag.severity === "critical" ? "text-red-600" : 
+                      flag.severity === "warning" ? "text-amber-600" : "text-blue-600"
+                    }`}>{config.label}</span>
+                  </div>
+                  <p className="text-sm font-medium text-stone-800">{flag.message}</p>
+                  <p className="text-xs text-stone-500 mt-1">→ {flag.recommendation}</p>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </section>
   );
 }
