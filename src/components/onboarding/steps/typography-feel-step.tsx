@@ -93,7 +93,7 @@ interface TypographyData {
   additionalNotes?: string;
 }
 
-export function TypographyFeelStep({ data, onSave, onNext, onPrev, allResponses, styleProfile: passedProfile }: StepProps) {
+export function TypographyFeelStep({ data, onSave, onNext, onPrev, allResponses, styleProfile: passedProfile, isOptional, onSkip }: StepProps) {
   const existingData = data as TypographyData | undefined;
   const [fontStyles, setFontStyles] = useState<string[]>(existingData?.fontStyles ?? []);
   const [fontWeight, setFontWeight] = useState<string>(existingData?.fontWeight ?? "");
@@ -162,13 +162,16 @@ export function TypographyFeelStep({ data, onSave, onNext, onPrev, allResponses,
   }
 
   async function handleNext() {
-    if (fontStyles.length === 0) {
-      setError("Please select at least one font style");
-      return;
-    }
-    if (!fontWeight) {
-      setError("Please select a font weight preference");
-      return;
+    // Only validate if user has started filling in (not skipping)
+    if (!isOptional) {
+      if (fontStyles.length === 0) {
+        setError("Please select at least one font style");
+        return;
+      }
+      if (!fontWeight) {
+        setError("Please select a font weight preference");
+        return;
+      }
     }
     await onSave("typography_feel", buildFormData());
     onNext();
@@ -348,9 +351,21 @@ export function TypographyFeelStep({ data, onSave, onNext, onPrev, allResponses,
         <Button type="button" variant="outline" onClick={onPrev} className="h-12 px-6">
           <ArrowLeft className="mr-2 h-4 w-4" /> Back
         </Button>
-        <Button type="button" onClick={handleNext} className="h-12 px-8">
-          Next <ArrowRight className="ml-2 h-4 w-4" />
-        </Button>
+        <div className="flex items-center gap-2">
+          {isOptional && onSkip && (
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={onSkip}
+              className="h-12 px-4 text-muted-foreground"
+            >
+              Skip
+            </Button>
+          )}
+          <Button type="button" onClick={handleNext} className="h-12 px-8">
+            Next <ArrowRight className="ml-2 h-4 w-4" />
+          </Button>
+        </div>
       </div>
     </div>
   );

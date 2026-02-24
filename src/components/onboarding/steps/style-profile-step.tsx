@@ -140,6 +140,8 @@ export function StyleProfileStep({
   onNext,
   onPrev,
   allResponses,
+  isOptional,
+  onSkip,
 }: StepProps) {
   const profile = useMemo(
     () => computeStyleProfile(allResponses || {}),
@@ -316,12 +318,23 @@ export function StyleProfileStep({
         >
           <ArrowLeft className="mr-2 h-4 w-4" /> Back
         </Button>
-        <Button
-          onClick={handleNext}
-          className="h-11 px-8 active:scale-95 transition-transform min-h-[44px]"
-        >
-          Next <ArrowRight className="ml-2 h-4 w-4" />
-        </Button>
+        <div className="flex items-center gap-2">
+          {isOptional && onSkip && (
+            <Button
+              variant="ghost"
+              onClick={onSkip}
+              className="h-11 px-4 text-muted-foreground min-h-[44px]"
+            >
+              Skip
+            </Button>
+          )}
+          <Button
+            onClick={handleNext}
+            className="h-11 px-8 active:scale-95 transition-transform min-h-[44px]"
+          >
+            Next <ArrowRight className="ml-2 h-4 w-4" />
+          </Button>
+        </div>
       </div>
     </div>
   );

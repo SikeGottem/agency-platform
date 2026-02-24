@@ -57,6 +57,13 @@ export function WelcomeStep({
             creative vision for your{" "}
             <strong>{PROJECT_TYPE_LABELS[projectType]}</strong> project.
           </p>
+
+          {/* Brief explainer for non-design clients */}
+          <p className="mt-3 text-sm text-muted-foreground/80 italic">
+            A brief is simply a document that captures what you want — your goals,
+            style preferences, and requirements — so your designer can nail it
+            first time.
+          </p>
         </div>
 
         {/* Time estimate */}

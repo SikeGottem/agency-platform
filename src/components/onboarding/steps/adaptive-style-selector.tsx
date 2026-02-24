@@ -1029,14 +1029,17 @@ export function AdaptiveStyleSelector({
         
         {/* Confidence selector or skip option */}
         {showingConfidence ? renderConfidenceSelector() : (
-          <div className="text-center">
+          <div className="text-center mt-4">
             <Button
-              variant="ghost"
+              variant="outline"
               onClick={() => setCurrentPairIndex(prev => prev + 1)}
-              className="text-muted-foreground hover:text-foreground min-h-[44px] touch-manipulation"
+              className="text-muted-foreground hover:text-foreground min-h-[44px] touch-manipulation border-dashed"
             >
-              Not sure, skip this one
+              I don&apos;t have a preference — skip this one
             </Button>
+            <p className="text-xs text-muted-foreground mt-2">
+              Totally fine! Skipping helps us focus on what matters to you.
+            </p>
           </div>
         )}
       </div>

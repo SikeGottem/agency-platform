@@ -44,6 +44,9 @@ interface StepConfig {
   key: string;
   label: string;
   component: React.ComponentType<StepProps>;
+  optional?: boolean;
+  /** Section grouping for progress encouragement */
+  section?: "basics" | "design" | "closing";
 }
 
 export interface StepProps {
@@ -69,13 +72,17 @@ export interface StepProps {
   designerName?: string;
   /** Client's display name */
   clientName?: string;
+  /** Whether this step can be skipped */
+  isOptional?: boolean;
+  /** Skip handler for optional steps */
+  onSkip?: () => void;
 }
 
 function getStepsForProjectType(projectType: ProjectType): StepConfig[] {
   const baseSteps: StepConfig[] = [
-    { key: "welcome", label: "Welcome", component: WelcomeStep },
-    { key: "business_info", label: "About Your Business", component: BusinessInfoStep },
-    { key: "project_scope", label: "Project Scope", component: ProjectScopeStep },
+    { key: "welcome", label: "Welcome", component: WelcomeStep, section: "basics" },
+    { key: "business_info", label: "About Your Business", component: BusinessInfoStep, section: "basics" },
+    { key: "project_scope", label: "Project Scope", component: ProjectScopeStep, section: "basics" },
   ];
 
   // Project-type specific steps inserted after project_scope
@@ -86,20 +93,22 @@ function getStepsForProjectType(projectType: ProjectType): StepConfig[] {
       key: "pages_functionality",
       label: "Pages & Features",
       component: PagesFunctionalityStep,
+      section: "basics",
     });
   } else if (projectType === "social_media") {
     projectSpecificSteps.push({
       key: "platforms_content",
       label: "Platforms & Content",
       component: PlatformsContentStep,
+      section: "basics",
     });
   }
 
   // Common design steps
   const designSteps: StepConfig[] = [
-    { key: "style_direction", label: "Style Direction", component: StyleDirectionStep },
-    { key: "style_profile", label: "Your Style DNA", component: StyleProfileStep },
-    { key: "color_preferences", label: "Colors", component: ColorPreferencesStep },
+    { key: "style_direction", label: "Style Direction", component: StyleDirectionStep, section: "design" },
+    { key: "style_profile", label: "Your Style DNA", component: StyleProfileStep, optional: true, section: "design" },
+    { key: "color_preferences", label: "Colors", component: ColorPreferencesStep, section: "design" },
   ];
 
   // Typography step only for branding projects
@@ -108,15 +117,17 @@ function getStepsForProjectType(projectType: ProjectType): StepConfig[] {
       key: "typography_feel",
       label: "Typography",
       component: TypographyFeelStep,
+      optional: true,
+      section: "design",
     });
   }
 
   // Closing steps
   const closingSteps: StepConfig[] = [
-    { key: "inspiration_upload", label: "Inspiration", component: InspirationUploadStep },
-    { key: "timeline_budget", label: "Timeline & Budget", component: TimelineBudgetStep },
-    { key: "final_thoughts", label: "Final Thoughts", component: FinalThoughtsStep },
-    { key: "review", label: "Review", component: ReviewStep },
+    { key: "inspiration_upload", label: "Inspiration", component: InspirationUploadStep, section: "closing" },
+    { key: "timeline_budget", label: "Timeline & Budget", component: TimelineBudgetStep, section: "closing" },
+    { key: "final_thoughts", label: "Final Thoughts", component: FinalThoughtsStep, section: "closing" },
+    { key: "review", label: "Review", component: ReviewStep, section: "closing" },
   ];
 
   return [...baseSteps, ...projectSpecificSteps, ...designSteps, ...closingSteps];
@@ -380,10 +391,16 @@ export function QuestionnaireWizard({
     }
   };
 
-  if (isSubmitted) {
-    // Show account creation CTA only for unauthenticated magic link users
-    const showAccountCTA = !!magicToken;
+  // Delay account CTA to let the celebration moment breathe
+  const [showAccountCTA, setShowAccountCTA] = useState(false);
+  useEffect(() => {
+    if (isSubmitted && magicToken) {
+      const timer = setTimeout(() => setShowAccountCTA(true), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [isSubmitted, magicToken]);
 
+  if (isSubmitted) {
     return (
       <div className="flex min-h-screen items-center justify-center px-4 py-12 relative overflow-hidden">
         {/* Confetti burst */}
@@ -393,14 +410,18 @@ export function QuestionnaireWizard({
             <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-green-100 animate-[selection-pop_0.5s_ease-out]">
               <Check className="h-8 w-8 text-green-600" />
             </div>
-            <h2 className="mb-2 text-2xl font-bold">Brief Submitted!</h2>
-            <p className="mb-8 text-muted-foreground">
+            <h2 className="mb-2 text-2xl font-bold">Brief Submitted! 🎉</h2>
+            <p className="mb-4 text-muted-foreground">
               Thanks, {clientName}! Your creative brief has been sent to{" "}
               {designerName}. They&apos;ll be in touch soon.
             </p>
+            <p className="mb-8 text-sm text-muted-foreground">
+              You&apos;ve just given your designer a huge head start. Great job!
+            </p>
 
+            {/* Delayed account CTA — fades in after celebration */}
             {showAccountCTA && (
-              <>
+              <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
                 <div className="mb-6 rounded-lg border-2 border-dashed border-primary/20 bg-primary/5 p-6 text-left">
                   <div className="mb-4 flex items-center gap-2">
                     <UserPlus className="h-5 w-5 text-primary" />
@@ -435,7 +456,7 @@ export function QuestionnaireWizard({
                     Sign in
                   </Link>
                 </p>
-              </>
+              </div>
             )}
           </CardContent>
         </Card>
@@ -511,16 +532,41 @@ export function QuestionnaireWizard({
         estimatedTimeRemaining={estimatedTimeRemaining}
       />
       
+      {/* Section transition encouragement */}
+      {(() => {
+        const prevSection = currentStep > 0 ? steps[currentStep - 1]?.section : null;
+        const currSection = currentStepConfig.section;
+        const sectionMessages: Record<string, string> = {
+          design: "✨ Nice work on the basics! Now let's explore the fun part — your style.",
+          closing: "🎨 Looking great! Just a few final details and you're done.",
+        };
+        if (currSection && prevSection && currSection !== prevSection && sectionMessages[currSection]) {
+          return (
+            <div className="mb-4 rounded-lg bg-primary/5 border border-primary/10 px-4 py-3 text-center animate-in fade-in slide-in-from-bottom-2 duration-500">
+              <p className="text-sm font-medium text-primary">{sectionMessages[currSection]}</p>
+            </div>
+          );
+        }
+        return null;
+      })()}
+
       {/* Current step label */}
       <div className="mb-6">
-        <p
-          className={cn(
-            "text-lg font-semibold transition-all duration-300",
-            isTransitioning ? "opacity-0 translate-y-1" : "opacity-100 translate-y-0"
+        <div className="flex items-center gap-2">
+          <p
+            className={cn(
+              "text-lg font-semibold transition-all duration-300",
+              isTransitioning ? "opacity-0 translate-y-1" : "opacity-100 translate-y-0"
+            )}
+          >
+            {currentStepConfig.label}
+          </p>
+          {currentStepConfig.optional && (
+            <span className="text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded-full font-medium">
+              Optional
+            </span>
           )}
-        >
-          {currentStepConfig.label}
-        </p>
+        </div>
       </div>
 
       {/* Step Content with slide/fade transition */}
@@ -551,6 +597,8 @@ export function QuestionnaireWizard({
           magicToken={magicToken}
           designerName={designerName}
           clientName={clientName}
+          isOptional={currentStepConfig.optional}
+          onSkip={currentStepConfig.optional ? handleNextWithTransition : undefined}
         />
       </div>
 

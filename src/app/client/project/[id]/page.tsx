@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { BriefViewer } from "@/components/dashboard/brief-viewer";
 import { ClientRevisionBanner } from "@/components/brief/client-revision-banner";
 import { ProjectTimeline } from "@/components/client/project-timeline";
+import { MessageThread } from "@/components/shared/message-thread";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Download, FileIcon } from "lucide-react";
@@ -177,6 +178,13 @@ export default async function ClientProjectPage({ params }: PageProps) {
           </div>
         </div>
       )}
+
+      {/* Message thread */}
+      <MessageThread
+        projectId={projectId}
+        currentUserId={user.id}
+        senderType="client"
+      />
 
       {/* CTA for actionable projects */}
       {(project.status === "sent" || project.status === "in_progress") &&
