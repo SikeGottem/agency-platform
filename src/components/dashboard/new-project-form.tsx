@@ -32,6 +32,7 @@ import {
   Palette, Globe, Share2, Package, PenTool, Layout, Printer, Play, Smartphone,
   Zap, ClipboardList,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
@@ -45,7 +46,7 @@ const newProjectSchema = z.object({
   clientName: z.string().min(1, "Client name is required").max(100),
   clientEmail: z.string().email("Please enter a valid email address"),
   projectType: z.enum(PROJECT_TYPES),
-  briefMode: z.enum(["full", "quick"]).default("full"),
+  briefMode: z.enum(["full", "quick"]),
   templateId: z.string().optional(),
   customMessage: z.string().max(500).optional(),
 });
@@ -73,6 +74,7 @@ export function NewProjectForm({ templates }: NewProjectFormProps) {
       clientName: "",
       clientEmail: "",
       projectType: "branding",
+      briefMode: "full",
       templateId: "",
       customMessage: "",
     },
@@ -114,6 +116,7 @@ export function NewProjectForm({ templates }: NewProjectFormProps) {
           client_name: data.clientName,
           client_email: data.clientEmail,
           project_type: data.projectType,
+          brief_mode: data.briefMode,
           template_id: data.templateId || null,
           status: "draft",
           custom_message: data.customMessage || null,
@@ -233,6 +236,51 @@ export function NewProjectForm({ templates }: NewProjectFormProps) {
                         </button>
                       );
                     })}
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="briefMode"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Brief Mode</FormLabel>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => field.onChange("full")}
+                      className={cn(
+                        "flex items-center gap-2 rounded-lg border-2 p-3 text-left transition-colors hover:bg-accent",
+                        field.value === "full"
+                          ? "border-primary bg-primary/5"
+                          : "border-muted"
+                      )}
+                    >
+                      <ClipboardList className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                      <div>
+                        <div className="text-sm font-medium">Full Brief</div>
+                        <div className="text-xs text-muted-foreground">10+ detailed steps</div>
+                      </div>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => field.onChange("quick")}
+                      className={cn(
+                        "flex items-center gap-2 rounded-lg border-2 p-3 text-left transition-colors hover:bg-accent",
+                        field.value === "quick"
+                          ? "border-primary bg-primary/5"
+                          : "border-muted"
+                      )}
+                    >
+                      <Zap className="h-5 w-5 text-amber-500 flex-shrink-0" />
+                      <div>
+                        <div className="text-sm font-medium">Quick Brief</div>
+                        <div className="text-xs text-muted-foreground">3 steps for small projects</div>
+                      </div>
+                    </button>
                   </div>
                   <FormMessage />
                 </FormItem>
