@@ -2,12 +2,32 @@
 
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { MoreHorizontal, Copy, Trash2 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -76,6 +96,7 @@ export function TemplateEditor({
   const [addStepOpen, setAddStepOpen] = useState(false);
   const [newStepTitle, setNewStepTitle] = useState("");
   const [newStepDescription, setNewStepDescription] = useState("");
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const moveStep = useCallback((index: number, direction: "up" | "down") => {
     setSteps((prev) => {
@@ -160,6 +181,45 @@ export function TemplateEditor({
     setSaved(false);
   }
 
+  async function handleDuplicate() {
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const { data, error } = await supabase
+      .from("templates")
+      .insert({
+        designer_id: user.id,
+        name: `${name} (Copy)`,
+        project_type: initialProjectType,
+        questions: steps as unknown as Json,
+        is_default: false,
+      })
+      .select()
+      .single();
+
+    if (!error && data) {
+      toast.success("Template duplicated");
+      router.push(`/dashboard/templates/${(data as Record<string, unknown>).id}`);
+    } else {
+      toast.error("Failed to duplicate template");
+    }
+  }
+
+  async function handleDelete() {
+    const supabase = createClient();
+    const { error } = await supabase.from("templates").delete().eq("id", templateId);
+
+    if (!error) {
+      toast.success("Template deleted");
+      router.push("/dashboard/templates");
+    } else {
+      toast.error("Failed to delete template");
+    }
+  }
+
   async function handleSave() {
     setIsSaving(true);
     const supabase = createClient();
@@ -221,6 +281,46 @@ export function TemplateEditor({
           <Button onClick={handleSave} disabled={isSaving}>
             {isSaving ? "Saving..." : "Save Changes"}
           </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={handleDuplicate}>
+                <Copy className="mr-2 h-4 w-4" />
+                Duplicate Template
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                className="text-destructive focus:text-destructive"
+                onClick={() => setDeleteDialogOpen(true)}
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Delete Template
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete template?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This will permanently delete &ldquo;{name}&rdquo;. Projects already using this template won&apos;t be affected.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  onClick={handleDelete}
+                >
+                  Delete
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </div>
 
