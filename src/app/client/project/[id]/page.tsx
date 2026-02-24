@@ -1,14 +1,17 @@
 import { createClient } from "@/lib/supabase/server";
 import { notFound, redirect } from "next/navigation";
-import { BriefViewer } from "@/components/dashboard/brief-viewer";
 import { ClientRevisionBanner } from "@/components/brief/client-revision-banner";
-import { ProjectTimeline } from "@/components/client/project-timeline";
+import { ProgressTracker, getPhaseFromStatus } from "@/components/client/progress-tracker";
+import { BriefSection } from "@/components/client/brief-section";
+import { DeliverablesSection } from "@/components/client/deliverables-section";
+import { DownloadSection } from "@/components/client/download-section";
+import { ActivityFeed } from "@/components/client/activity-feed";
 import { MessageThread } from "@/components/shared/message-thread";
+import { ClientFeedbackSection } from "@/components/portal/client-feedback-section";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Download, FileIcon } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import { ClientFeedbackSection } from "@/components/portal/client-feedback-section";
 import {
   PROJECT_TYPE_LABELS,
   type ProjectType,
@@ -75,7 +78,7 @@ export default async function ClientProjectPage({ params }: PageProps) {
     .select("step_key, answers")
     .eq("project_id", projectId);
 
-  // Fetch revision requests for the timeline
+  // Fetch revision requests
   const { data: revisions } = await supabase
     .from("revision_requests")
     .select("id, status, created_at, responded_at")
@@ -86,11 +89,26 @@ export default async function ClientProjectPage({ params }: PageProps) {
     (r) => r.status === "pending"
   );
 
-  // Build timeline events
-  const timelineEvents = buildTimelineEvents(project, revisions ?? []);
+  // Determine current phase
+  const currentPhase = getPhaseFromStatus(
+    project.status,
+    hasPendingRevision,
+    false // TODO: check if any shared deliverables exist
+  );
+
+  // Status display config
+  const statusConfig = hasPendingRevision
+    ? { label: "Needs Revision", color: "bg-red-50 text-red-700" }
+    : project.status === "reviewed"
+      ? { label: "Complete", color: "bg-emerald-50 text-emerald-700" }
+      : project.status === "completed"
+        ? { label: "Ready for Review", color: "bg-purple-50 text-purple-700" }
+        : project.status === "in_progress"
+          ? { label: "In Design", color: "bg-amber-50 text-amber-700" }
+          : { label: "Brief Submitted", color: "bg-blue-50 text-blue-700" };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 pb-12">
       {/* Back nav */}
       <div>
         <Button variant="ghost" size="sm" asChild className="-ml-2 text-stone-500 hover:text-stone-900">
@@ -114,32 +132,13 @@ export default async function ClientProjectPage({ params }: PageProps) {
             {PROJECT_TYPE_LABELS[project.project_type as ProjectType]}
           </p>
         </div>
-        <Badge
-          variant="secondary"
-          className={
-            hasPendingRevision
-              ? "bg-red-50 text-red-700"
-              : project.status === "reviewed"
-                ? "bg-purple-50 text-purple-700"
-                : project.status === "completed"
-                  ? "bg-emerald-50 text-emerald-700"
-                  : "bg-amber-50 text-amber-700"
-          }
-        >
-          {hasPendingRevision
-            ? "Needs Revision"
-            : project.status === "reviewed"
-              ? "Done"
-              : project.status === "completed"
-                ? "Ready for Review"
-                : project.status === "in_progress"
-                  ? "In Design"
-                  : "Brief Submitted"}
+        <Badge variant="secondary" className={statusConfig.color}>
+          {statusConfig.label}
         </Badge>
       </div>
 
-      {/* Timeline */}
-      <ProjectTimeline events={timelineEvents} />
+      {/* 1. Progress Tracker */}
+      <ProgressTracker currentPhase={currentPhase} />
 
       {/* Revision banner */}
       {hasPendingRevision && (
@@ -149,7 +148,24 @@ export default async function ClientProjectPage({ params }: PageProps) {
         />
       )}
 
-      {/* Feedback & Approval flows */}
+      {/* 2. Brief section (collapsible) */}
+      <BriefSection
+        briefContent={(brief?.content as Record<string, unknown>) ?? null}
+        responses={
+          (responses ?? []).map((r) => ({
+            step_key: r.step_key,
+            answers: r.answers as Record<string, unknown>,
+          }))
+        }
+      />
+
+      {/* 3. Concepts & Deliverables */}
+      <DeliverablesSection
+        projectId={projectId}
+        designerName={designerName}
+      />
+
+      {/* 4. Feedback & Approval */}
       <ClientFeedbackSection
         projectId={projectId}
         projectStatus={project.status}
@@ -157,43 +173,20 @@ export default async function ClientProjectPage({ params }: PageProps) {
         hasPendingRevision={hasPendingRevision}
       />
 
-      {/* Brief viewer — read-only */}
-      {(brief?.content || (responses && responses.length > 0)) && (
-        <div>
-          <h2 className="font-[family-name:var(--font-display)] text-xl font-semibold text-stone-900 mb-4">
-            Your Brief
-          </h2>
-          <BriefViewer
-            content={brief?.content ?? null}
-            projectId={projectId}
-            responses={responses ?? []}
-          />
-        </div>
-      )}
-
-      {/* Deliverables section — shown when project is reviewed/done */}
+      {/* 5. Download section (when project complete) */}
       {project.status === "reviewed" && (
-        <div className="rounded-2xl border border-stone-200/60 bg-white p-6">
-          <h2 className="font-[family-name:var(--font-display)] text-xl font-semibold text-stone-900 mb-4">
-            Deliverables
-          </h2>
-          <div className="rounded-xl border border-dashed border-stone-200 bg-stone-50/50 p-8 text-center">
-            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-stone-100">
-              <FileIcon className="h-5 w-5 text-stone-400" />
-            </div>
-            <p className="text-sm text-stone-500">
-              Your designer will upload deliverables here when they&apos;re ready.
-            </p>
-          </div>
-        </div>
+        <DownloadSection deliverables={[]} projectStatus={project.status} />
       )}
 
-      {/* Message thread */}
+      {/* 6. Messages */}
       <MessageThread
         projectId={projectId}
         currentUserId={user.id}
         senderType="client"
       />
+
+      {/* 7. Activity Feed */}
+      <ActivityFeed projectId={projectId} />
 
       {/* CTA for actionable projects */}
       {(project.status === "sent" || project.status === "in_progress") &&
@@ -217,98 +210,4 @@ export default async function ClientProjectPage({ params }: PageProps) {
         )}
     </div>
   );
-}
-
-/* ── Timeline builder ── */
-
-interface RevisionRow {
-  id: string;
-  status: string;
-  created_at: string;
-  responded_at: string | null;
-}
-
-export interface TimelineEvent {
-  label: string;
-  date: string | null;
-  status: "completed" | "current" | "upcoming";
-}
-
-function buildTimelineEvents(
-  project: { status: string; created_at: string; completed_at: string | null },
-  revisions: RevisionRow[]
-): TimelineEvent[] {
-  const events: TimelineEvent[] = [];
-  const s = project.status;
-
-  // 1. Brief started
-  events.push({
-    label: "Brief created",
-    date: project.created_at,
-    status: "completed",
-  });
-
-  // 2. Brief submitted
-  if (["completed", "reviewed"].includes(s)) {
-    events.push({
-      label: "Brief submitted",
-      date: project.completed_at,
-      status: "completed",
-    });
-  } else if (s === "in_progress") {
-    events.push({
-      label: "Brief in progress",
-      date: null,
-      status: "current",
-    });
-  } else {
-    events.push({
-      label: "Brief submitted",
-      date: null,
-      status: "upcoming",
-    });
-  }
-
-  // 3. Designer reviewing
-  if (["completed", "reviewed"].includes(s)) {
-    events.push({
-      label: "Designer reviewing",
-      date: project.completed_at,
-      status: s === "completed" && revisions.length === 0 ? "current" : "completed",
-    });
-  } else {
-    events.push({
-      label: "Designer reviewing",
-      date: null,
-      status: "upcoming",
-    });
-  }
-
-  // 4. Revision requested (only if revisions exist)
-  if (revisions.length > 0) {
-    const latestRevision = revisions[0];
-    const pending = revisions.some((r) => r.status === "pending");
-    events.push({
-      label: "Revision requested",
-      date: latestRevision.created_at,
-      status: pending ? "current" : "completed",
-    });
-  }
-
-  // 5. Approved
-  if (s === "reviewed") {
-    events.push({
-      label: "Approved",
-      date: null,
-      status: "completed",
-    });
-  } else {
-    events.push({
-      label: "Approved",
-      date: null,
-      status: "upcoming",
-    });
-  }
-
-  return events;
 }
