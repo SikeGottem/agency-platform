@@ -19,7 +19,8 @@ export default async function InvoicesPage() {
     (user.user_metadata?.role as UserRole) ?? "designer";
   if (role !== "designer") redirect("/dashboard");
 
-  const { data: invoices } = await supabase
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: invoices } = await (supabase as any)
     .from("invoices")
     .select("*")
     .eq("designer_id", user.id)
