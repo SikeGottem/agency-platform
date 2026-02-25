@@ -5,6 +5,7 @@ DROP POLICY IF EXISTS "Public can view revision requests" ON public.revision_req
 DROP POLICY IF EXISTS "Public can respond to revision requests" ON public.revision_requests;
 
 -- Designers can view revision requests they created
+DROP POLICY IF EXISTS "Designers can view own revision requests" ON public.revision_requests;
 CREATE POLICY "Designers can view own revision requests"
   ON public.revision_requests FOR SELECT
   USING (auth.uid() = designer_id);
