@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Sparkles } from 'lucide-react';
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -16,12 +16,16 @@ export default function LoginPage() {
   const router = useRouter();
   const supabase = createClient();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+    });
 
     if (error) {
       setError(error.message);
@@ -33,7 +37,7 @@ export default function LoginPage() {
     router.refresh();
   };
 
-  const handleGoogleLogin = async () => {
+  const handleGoogleSignUp = async () => {
     await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: { redirectTo: `${window.location.origin}/auth/callback` },
@@ -48,10 +52,10 @@ export default function LoginPage() {
             <Sparkles className="h-7 w-7 text-accent" />
             <span className="text-xl font-semibold">Briefed</span>
           </Link>
-          <p className="text-text-secondary text-sm">Sign in to your account</p>
+          <p className="text-text-secondary text-sm">Create your account</p>
         </div>
 
-        <form onSubmit={handleLogin} className="space-y-4">
+        <form onSubmit={handleRegister} className="space-y-4">
           <div className="space-y-2">
             <label className="text-sm text-text-secondary">Email</label>
             <Input
@@ -70,6 +74,7 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              minLength={6}
             />
           </div>
 
@@ -78,7 +83,7 @@ export default function LoginPage() {
           )}
 
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? 'Signing in...' : 'Sign in'}
+            {loading ? 'Creating account...' : 'Create account'}
           </Button>
         </form>
 
@@ -91,14 +96,14 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <Button variant="outline" className="w-full" onClick={handleGoogleLogin}>
+        <Button variant="outline" className="w-full" onClick={handleGoogleSignUp}>
           Continue with Google
         </Button>
 
         <p className="text-center text-sm text-text-secondary">
-          Don&apos;t have an account?{' '}
-          <Link href="/register" className="text-accent hover:text-accent-hover">
-            Sign up
+          Already have an account?{' '}
+          <Link href="/login" className="text-accent hover:text-accent-hover">
+            Sign in
           </Link>
         </p>
       </div>
