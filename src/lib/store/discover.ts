@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { UnsplashImage } from '@/lib/unsplash';
+import type { PexelsImage as UnsplashImage } from '@/lib/pexels';
 
 export interface CanvasImage extends UnsplashImage {
   // Canvas positioning
@@ -58,16 +58,55 @@ export const useDiscoverStore = create<DiscoverState>((set, get) => ({
     const existingIds = new Set(existing.map((i) => i.id));
     const now = Date.now();
 
-    const canvasImages: CanvasImage[] = newImages
-      .filter((img) => !existingIds.has(img.id))
+    const filteredNew = newImages.filter((img) => !existingIds.has(img.id));
+
+    // Pre-calculate positions: row-based layout with uniform gaps
+    const GAP = 14;
+    const ROW_HEIGHT = 120; // matches IMG_DISPLAY_SIZE
+    const MAX_ROW_WIDTH = 900;
+    const positions: { x: number; y: number }[] = [];
+    let cursorX = 0;
+    let cursorY = 0;
+    const rowImages: { w: number; idx: number }[][] = [[]];
+
+    // First pass: assign images to rows based on their width
+    for (let idx = 0; idx < filteredNew.length; idx++) {
+      const img = filteredNew[idx];
+      const aspect = img.width / img.height;
+      const imgW = ROW_HEIGHT * aspect;
+      if (cursorX + imgW > MAX_ROW_WIDTH && rowImages[rowImages.length - 1].length > 0) {
+        rowImages.push([]);
+        cursorX = 0;
+      }
+      rowImages[rowImages.length - 1].push({ w: imgW, idx });
+      cursorX += imgW + GAP;
+    }
+
+    // Second pass: center each row and compute positions
+    let yOffset = 0;
+    for (const row of rowImages) {
+      const totalW = row.reduce((sum, r) => sum + r.w, 0) + (row.length - 1) * GAP;
+      let xOffset = -totalW / 2;
+      for (const item of row) {
+        positions[item.idx] = {
+          x: centerX + xOffset + item.w / 2,
+          y: centerY + yOffset,
+        };
+        xOffset += item.w + GAP;
+      }
+      yOffset += ROW_HEIGHT + GAP;
+    }
+    // Center vertically
+    const totalHeight = rowImages.length * ROW_HEIGHT + (rowImages.length - 1) * GAP;
+    for (const pos of positions) {
+      pos.y -= totalHeight / 2;
+    }
+
+    const canvasImages: CanvasImage[] = filteredNew
       .map((img, i) => {
-        // Burst layout: spread in a circle from center
-        const angle = (i / newImages.length) * Math.PI * 2 + Math.random() * 0.3;
-        const distance = 150 + Math.random() * 200;
-        const targetX = centerX + Math.cos(angle) * distance;
-        const targetY = centerY + Math.sin(angle) * distance;
-        // Subtle size variation based on index (first results = slightly larger)
-        const baseScale = 0.8 + (1 - i / newImages.length) * 0.3;
+        const targetX = positions[i].x;
+        const targetY = positions[i].y;
+        const baseScale = 1;
 
         return {
           ...img,
@@ -79,7 +118,7 @@ export const useDiscoverStore = create<DiscoverState>((set, get) => ({
           targetScale: baseScale,
           opacity: 0,
           targetOpacity: 1,
-          rotation: (Math.random() - 0.5) * 6,
+          rotation: 0,
           vx: 0,
           vy: 0,
           selected: false,

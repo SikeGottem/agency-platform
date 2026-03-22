@@ -33,10 +33,10 @@ function CanvasImageNode({ data }: { data: CanvasImage }) {
   const updatePosition = useDiscoverStore((s) => s.updateImagePosition);
   const groupRef = useRef<Konva.Group>(null);
 
-  const size = IMG_DISPLAY_SIZE * data.scale;
+  const h = IMG_DISPLAY_SIZE * data.scale;
   const aspectRatio = data.width / data.height;
-  const displayW = aspectRatio >= 1 ? size : size * aspectRatio;
-  const displayH = aspectRatio >= 1 ? size / aspectRatio : size;
+  const displayW = h * aspectRatio;
+  const displayH = h;
 
   return (
     <Group
@@ -182,33 +182,7 @@ export default function DiscoveryCanvas() {
         return { ...img, x, y, vx, vy, scale, opacity };
       });
 
-      // Soft collision
-      for (let i = 0; i < updated.length; i++) {
-        for (let j = i + 1; j < updated.length; j++) {
-          const a = updated[i];
-          const b = updated[j];
-          const ddx = a.x - b.x;
-          const ddy = a.y - b.y;
-          const dist = Math.sqrt(ddx * ddx + ddy * ddy);
-          const minDist = a.radius + b.radius;
-          if (dist < minDist && dist > 0) {
-            const overlap = (minDist - dist) * COLLISION_STRENGTH;
-            const nx = ddx / dist;
-            const ny = ddy / dist;
-            updated[i] = {
-              ...updated[i],
-              targetX: updated[i].targetX + nx * overlap,
-              targetY: updated[i].targetY + ny * overlap,
-            };
-            updated[j] = {
-              ...updated[j],
-              targetX: updated[j].targetX - nx * overlap,
-              targetY: updated[j].targetY - ny * overlap,
-            };
-            changed = true;
-          }
-        }
-      }
+      // Collision disabled — images are tiled in a grid
 
       if (changed) {
         store.setState({ images: updated });

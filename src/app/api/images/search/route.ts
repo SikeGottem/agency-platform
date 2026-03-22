@@ -1,24 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 import {
-  type UnsplashImage,
-  type UnsplashSearchResponse,
+  type PexelsImage,
+  type PexelsSearchResponse,
   getCached,
   setCache,
   checkRateLimit,
   incrementRateLimit,
-} from '@/lib/unsplash';
+} from '@/lib/pexels';
 
-const UNSPLASH_API = 'https://api.unsplash.com';
+const PEXELS_API = 'https://api.pexels.com/v1';
 
 export async function GET(request: NextRequest) {
-  const accessKey = process.env.UNSPLASH_ACCESS_KEY;
+  const apiKey = process.env.PEXELS_API_KEY;
 
-  if (!accessKey) {
+  if (!apiKey) {
     return NextResponse.json(
       {
         error: 'missing_api_key',
         message:
-          'Unsplash API key not configured. Add UNSPLASH_ACCESS_KEY to .env.local. Get one at https://unsplash.com/developers',
+          'Pexels API key not configured. Add PEXELS_API_KEY to .env.local. Get one at https://pexels.com/api',
       },
       { status: 503 }
     );
@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
   // Check rate limit
   if (!checkRateLimit()) {
     return NextResponse.json(
-      { error: 'rate_limited', message: 'Unsplash API rate limit reached. Try again later.' },
+      { error: 'rate_limited', message: 'Pexels API rate limit reached. Try again later.' },
       { status: 429 }
     );
   }
@@ -51,20 +51,19 @@ export async function GET(request: NextRequest) {
   try {
     incrementRateLimit();
     const res = await fetch(
-      `${UNSPLASH_API}/search/photos?query=${encodeURIComponent(query)}&page=${page}&per_page=${perPage}&order_by=relevant`,
+      `${PEXELS_API}/search?query=${encodeURIComponent(query)}&page=${page}&per_page=${perPage}`,
       {
         headers: {
-          Authorization: `Client-ID ${accessKey}`,
-          'Accept-Version': 'v1',
+          Authorization: apiKey,
         },
       }
     );
 
     if (!res.ok) {
       const text = await res.text();
-      console.error('Unsplash API error:', res.status, text);
+      console.error('Pexels API error:', res.status, text);
       return NextResponse.json(
-        { error: 'upstream_error', message: `Unsplash API returned ${res.status}` },
+        { error: 'upstream_error', message: `Pexels API returned ${res.status}` },
         { status: 502 }
       );
     }
@@ -72,37 +71,36 @@ export async function GET(request: NextRequest) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const data = await res.json() as any;
 
-    const response: UnsplashSearchResponse = {
+    const response: PexelsSearchResponse = {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      images: data.results.map((photo: any): UnsplashImage => ({
-        id: photo.id,
-        url: photo.urls.regular,
-        thumbnailUrl: photo.urls.thumb,
-        smallUrl: photo.urls.small,
+      images: data.photos.map((photo: any): PexelsImage => ({
+        id: String(photo.id),
+        url: photo.src.large,
+        thumbnailUrl: photo.src.tiny,
+        smallUrl: photo.src.small,
         width: photo.width,
         height: photo.height,
-        color: photo.color || '#333333',
-        description: photo.alt_description || photo.description,
+        color: photo.avg_color || '#333333',
+        description: photo.alt || null,
         photographer: {
-          name: photo.user.name,
-          username: photo.user.username,
-          profileUrl: photo.user.links.html,
+          name: photo.photographer,
+          username: photo.photographer.toLowerCase().replace(/\s+/g, '-'),
+          profileUrl: photo.photographer_url,
         },
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        tags: (photo.tags || []).slice(0, 5).map((t: any) => t.title),
-        likes: photo.likes,
-        createdAt: photo.created_at,
+        tags: [], // Pexels doesn't return tags in search
+        likes: 0,
+        createdAt: new Date().toISOString(),
       })),
-      total: data.total,
-      totalPages: data.total_pages,
+      total: data.total_results,
+      totalPages: Math.ceil(data.total_results / perPage),
     };
 
     setCache(cacheKey, response);
     return NextResponse.json(response);
   } catch (err) {
-    console.error('Unsplash fetch error:', err);
+    console.error('Pexels fetch error:', err);
     return NextResponse.json(
-      { error: 'fetch_error', message: 'Failed to fetch from Unsplash' },
+      { error: 'fetch_error', message: 'Failed to fetch from Pexels' },
       { status: 500 }
     );
   }

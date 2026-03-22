@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Search, Loader2, Sparkles, Plus, Save, X } from 'lucide-react';
 import { useDiscoverStore } from '@/lib/store/discover';
 import { createClient } from '@/lib/supabase/client';
-import type { UnsplashSearchResponse } from '@/lib/unsplash';
+import type { PexelsSearchResponse } from '@/lib/pexels';
 
 const DiscoveryCanvas = dynamic(
   () => import('@/components/canvas/discovery-canvas'),
@@ -61,7 +61,7 @@ export default function DiscoverPage() {
           return;
         }
 
-        const result = data as UnsplashSearchResponse;
+        const result = data as PexelsSearchResponse;
         const cx = centerX ?? canvasCenterRef.current.x;
         const cy = centerY ?? canvasCenterRef.current.y;
         addImages(result.images, cx, cy);
@@ -132,7 +132,7 @@ export default function DiscoverPage() {
         board_id: (board as any).id,
         image_url: img.url,
         thumbnail_url: img.thumbnailUrl,
-        source: 'unsplash',
+        source: 'pexels',
         source_id: img.id,
         position_x: i % 4,
         position_y: Math.floor(i / 4),
@@ -171,13 +171,13 @@ export default function DiscoverPage() {
             <div className="text-center space-y-3">
               {apiKeyMissing ? (
                 <>
-                  <p className="text-yellow-400 text-lg font-medium">⚠️ Unsplash API Key Missing</p>
+                  <p className="text-yellow-400 text-lg font-medium">⚠️ Pexels API Key Missing</p>
                   <p className="text-text-tertiary text-sm max-w-md">
-                    Add <code className="bg-bg-tertiary px-1.5 py-0.5 rounded text-xs">UNSPLASH_ACCESS_KEY</code> to
+                    Add <code className="bg-bg-tertiary px-1.5 py-0.5 rounded text-xs">PEXELS_API_KEY</code> to
                     your .env.local file.
                     <br />
                     Get one free at{' '}
-                    <span className="text-accent">unsplash.com/developers</span>
+                    <span className="text-accent">pexels.com/api</span>
                   </p>
                 </>
               ) : (
